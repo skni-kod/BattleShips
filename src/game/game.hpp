@@ -1,14 +1,13 @@
 #pragma once
 
-#include "../../include/Window.hpp"
-#include "../../include/Image.hpp"
-#include "../../include/Texture2D.hpp"
-#include "../../include/Color.hpp"
+#include <raylib-cpp/raylib-cpp.hpp>
+
+#include "../board/board.hpp"
 
 class Game {
 public:
 	void loop();
 
 private:
-	const int window_width = 800, window_height = 450;
+	const int window_width = 600, window_height = 480;
 };

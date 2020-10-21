@@ -7,4 +7,4 @@ configure:
 	cd build && cmake ..
 
 build:
-	cd build && make
+	cd build && make && ./battleships
