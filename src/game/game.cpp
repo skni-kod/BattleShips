@@ -1,12 +1,13 @@
 #include "game.hpp"
 
-void Game::loop() {
+void Game::loop()
+{
 	raylib::Window window(window_width, window_height, "Battleships");
 	window.ToggleFullscreen();
 
 	SetTargetFPS(60);
 
-	Board board(10, 10, 40, 40, 3*40, 40);
+	Board board(10, 10, 40, 40, 3 * 40, 40);
 
 	while (!window.ShouldClose()) {
 		auto mouse_pos = GetMousePosition();

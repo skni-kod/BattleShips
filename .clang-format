@@ -1,0 +1,9 @@
+Language:        Cpp
+BasedOnStyle: LLVM
+ColumnLimit: 120
+IndentWidth: 8
+UseTab: Always
+BreakBeforeBraces: Linux
+AllowShortIfStatementsOnASingleLine: false
+AccessModifierOffset: -8
+IndentCaseLabels: false

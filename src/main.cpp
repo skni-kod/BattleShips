@@ -1,6 +1,7 @@
 #include "game/game.hpp"
 
-int main() {
+int main()
+{
 	Game game;
 
 	game.loop();

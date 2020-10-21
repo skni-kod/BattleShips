@@ -4,7 +4,8 @@
 
 #include "../board/board.hpp"
 
-class Game {
+class Game
+{
 public:
 	void loop();
 
