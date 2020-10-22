@@ -8,14 +8,14 @@ void Game::loop()
 
 	window.SetTargetFPS(60);
 
-	Board board(10, 10, 40, 40);
+	Board board(10, 10, 40, 40, 2.5f*40, 40);
 
 	while (!window.ShouldClose()) {
 		auto mouse_pos = mouse.GetPosition();
 
 		board.update_highlight(mouse_pos);
 
-		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+		if (mouse.IsButtonPressed(MOUSE_LEFT_BUTTON))
 			board.update_selected(mouse_pos);
 
 		window.BeginDrawing();
