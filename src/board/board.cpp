@@ -3,7 +3,7 @@
 Board::Board(unsigned int rows, unsigned int cols, unsigned int cell_w, unsigned int cell_h, float x, float y)
     : _rows(rows), _cols(cols), _board(x, y, rows * cell_w, cols * cell_h)
 {
-	for (int i; i < rows * cols; i++) {
+	for (int i = 0; i < rows * cols; i++) {
 		unsigned int cell_x = to_row(i) * cell_w + _board.x;
 		unsigned int cell_y = to_col(i) * cell_h + _board.y;
 		_cells.emplace_back(cell_x, cell_y, cell_w, cell_h);

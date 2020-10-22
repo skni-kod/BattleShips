@@ -1,4 +1,5 @@
 .git/
 .clangd/
+.vs/
 build/
 tags
