@@ -1,5 +1,15 @@
 #include "board.hpp"
 
+Board::Board(unsigned int rows, unsigned int cols, unsigned int cell_w, unsigned int cell_h, float x, float y)
+    : _rows(rows), _cols(cols), _board(x, y, rows * cell_w, cols * cell_h)
+{
+	for (int i; i < rows * cols; i++) {
+		unsigned int cell_x = to_row(i) * cell_w + _board.x;
+		unsigned int cell_y = to_col(i) * cell_h + _board.y;
+		_cells.emplace_back(cell_x, cell_y, cell_w, cell_h);
+	}
+}
+
 void Board::update_highlight(const raylib::Vector2 &mouse_pos)
 {
 	if (_board.CheckCollision(mouse_pos))
@@ -22,22 +32,20 @@ void Board::update_selected(const raylib::Vector2 &mouse_pos)
 	}
 }
 
-const std::vector<unsigned int> &Board::get_data() const { return _selected_cells; }
-
-void Board::draw() const
+void Board::draw()
 {
 	for (int i = 0; i < _cells.size(); i++) {
 		if (i == _highlighted_index)
-			DrawRectangleLinesEx(_cells[i], 2, _highlighted_color);
+			_cells[i].DrawLinesEx(2, _highlighted_color);
 		else
-			DrawRectangleLinesEx(_cells[i], 2, _normal_color);
+			_cells[i].DrawLinesEx(2, _normal_color);
 	}
 
 	for (auto &i : _selected_cells) {
-		DrawLine(_cells[i].x + 2, _cells[i].y + 2, _cells[i].x + _cells[i].width - 2,
-			 _cells[i].y + _cells[i].height - 2, _selected_color);
-		DrawLine(_cells[i].x + 2, _cells[i].y + _cells[i].height - 2, _cells[i].x + _cells[i].width - 2,
-			 _cells[i].y + 2, _selected_color);
+		_selected_color.DrawLine(_cells[i].x + 2, _cells[i].y + 2, _cells[i].x + _cells[i].width - 2,
+					 _cells[i].y + _cells[i].height - 2);
+		_selected_color.DrawLine(_cells[i].x + 2, _cells[i].y + _cells[i].height - 2,
+					 _cells[i].x + _cells[i].width - 2, _cells[i].y + 2);
 	}
 }
 

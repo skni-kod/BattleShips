@@ -1,6 +1,8 @@
 #pragma once
 
-#include <raylib-cpp/raylib-cpp.hpp>
+#include "Color.hpp"
+#include "Mouse.hpp"
+#include "Window.hpp"
 
 #include "../board/board.hpp"
 
