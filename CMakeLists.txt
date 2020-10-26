@@ -48,6 +48,22 @@ if (NOT raylib-cpp_FOUND)
 	endif()
 endif()
 
+# asio
+find_package(asio 1.18.0 QUIET)
+if (NOT asio_FOUND)
+	include(FetchContent)
+	FetchContent_Declare(
+		asio
+		GIT_REPOSITORY https://github.com/chriskohlhoff/asio
+		GIT_TAG be7badc31abcc395cf868de6a1e240c2350bdbf2
+	)
+	FetchContent_GetProperties(asio)
+	if (NOT asio_POPULATED) # Have we downloaded raylib yet?
+		set(FETCHCONTENT_QUIET NO)
+		FetchContent_Populate(asio)
+	endif()
+endif()
+
 # This is the main part:
 file(GLOB PROJECT_SOURCES
     src/main.cpp
@@ -58,4 +74,5 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 set(raylib_VERBOSE 1)
 include_directories(SYSTEM ${raylib_SOURCE_DIR}/src)
 include_directories(SYSTEM ${raylib-cpp_SOURCE_DIR}/include)
+include_directories(SYSTEM ${asio_SOURCE_DIR}/asio/include)
 target_link_libraries(${PROJECT_NAME} PUBLIC project_options project_warnings raylib raylib-cpp)
