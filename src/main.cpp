@@ -7,7 +7,5 @@ int main()
 
 	game.loop();
 
-	network::test();
-
 	return 0;
 }
