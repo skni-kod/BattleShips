@@ -7,14 +7,12 @@
 namespace network
 {
 
-template<typename MessageType>
-struct MessageHeader {
+template <typename MessageType> struct MessageHeader {
 	MessageType type;
 	size_t size;
 };
 
-template<typename MessageType>
-class Message
+template <typename MessageType> class Message
 {
 	MessageHeader<MessageType> header;
 	std::vector<std::uint8_t> body;
