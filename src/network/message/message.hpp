@@ -7,19 +7,16 @@
 namespace network
 {
 
-enum class MessageType {
-	Connection,
-	Shots,
-};
-
+template<typename MessageType>
 struct MessageHeader {
 	MessageType type;
 	size_t size;
 };
 
+template<typename MessageType>
 class Message
 {
-	MessageHeader header;
+	MessageHeader<MessageType> header;
 	std::vector<std::uint8_t> body;
 
 	size_t size() const { return sizeof(header) + body.size(); }
