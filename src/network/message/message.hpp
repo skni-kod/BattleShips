@@ -2,6 +2,8 @@
 
 #include <cstdint>
 #include <cstring>
+#include <memory>
+#include <ostream>
 #include <vector>
 
 namespace network
@@ -12,14 +14,12 @@ template <typename MessageType> struct MessageHeader {
 	size_t size;
 };
 
-template <typename MessageType> class Message
-{
+template <typename MessageType> struct Message {
 	MessageHeader<MessageType> header;
 	std::vector<std::uint8_t> body;
 
 	size_t size() const { return sizeof(header) + body.size(); }
 
-public:
 	template <typename T> void add(const T &data)
 	{
 		static_assert(std::is_standard_layout<T>::value, "Data cannot be copied!");
@@ -44,6 +44,19 @@ public:
 		body.resize(size_after);
 
 		header.size = size();
+	}
+};
+
+template <typename MessageType> class Connection;
+
+template <typename MessageType> struct OwnedMessage {
+	std::shared_ptr<Connection<MessageType>> remote = nullptr;
+	Message<MessageType> message;
+
+	friend std::ostream &operator<<(std::ostream &os, const OwnedMessage<MessageType> &msg)
+	{
+		os << msg.message;
+		return os;
 	}
 };
 
