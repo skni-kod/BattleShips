@@ -1,5 +1,6 @@
 #pragma once
 
+#include <condition_variable>
 #include <deque>
 #include <mutex>
 #include <utility>
@@ -30,12 +31,18 @@ public:
 	{
 		std::scoped_lock lock(mux);
 		deque.emplace_front(std::move(item));
+
+		std::unique_lock<std::mutex> ul(mux_block);
+		block.notify_one();
 	}
 
 	void push_back(const T &item)
 	{
 		std::scoped_lock lock(mux);
 		deque.emplace_back(std::move(item));
+
+		std::unique_lock<std::mutex> ul(mux_block);
+		block.notify_one();
 	}
 
 	T pop_front()
@@ -72,9 +79,20 @@ public:
 		deque.clear();
 	}
 
+	void wait()
+	{
+		while (empty())
+		{
+			std::unique_lock<std::mutex> ul(mux_block);
+			block.wait(ul);
+		}
+	}
+
 protected:
 	std::mutex mux;
 	std::deque<T> deque;
+	std::condition_variable block;
+	std::mutex mux_block;
 };
 
 } // namespace network
