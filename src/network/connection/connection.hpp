@@ -17,14 +17,14 @@ public:
 
 	Connection(owner parent, asio::io_context &ctx, asio::ip::tcp::socket sock,
 		   Queue<OwnedMessage<MessageType>> &in)
-	    : context(ctx), socket(std::move(sock)), input(in)
+	    : socket(std::move(sock)), context(ctx), input(in)
 	{
 		owner_type = parent;
 	}
 
-	virtual ~Connection();
+	virtual ~Connection() {};
 
-	uint32_t GetID() const { return id; }
+	uint32_t get_id() const { return id; }
 
 	void connect_client(uint32_t uid = 0)
 	{
@@ -39,16 +39,17 @@ public:
 	void connect_server(const asio::ip::tcp::resolver::results_type &endpoints)
 	{
 		if (owner_type == owner::client) {
-			asio::async_connect(socket, endpoints,
-					    [this](std::error_code ec, asio::ip::tcp::endpoint endpoint) {
-						    if (!ec) {
-							    read_header();
-						    }
-					    });
+			asio::async_connect(
+			    socket, endpoints,
+			    [this](std::error_code ec, asio::ip::tcp::endpoint endpoint [[maybe_unused]]) {
+				    if (!ec) {
+					    read_header();
+				    }
+			    });
 		}
 	}
 
-	bool disconnect()
+	void disconnect()
 	{
 		if (is_connected())
 			asio::post(context, [this]() { socket.close(); });
@@ -56,7 +57,7 @@ public:
 
 	bool is_connected() const { return socket.is_open(); }
 
-	bool send(const Message<MessageType> &msg)
+	void send(const Message<MessageType> &msg)
 	{
 		asio::post(context, [this, msg]() {
 			bool writing = !output.empty();
@@ -67,10 +68,11 @@ public:
 		});
 	}
 
+private:
 	void write_header()
 	{
-		asio::async_write(socket, asio::buffer(output.front().header(), sizeof(MessageHeader<MessageType>)),
-				  [this](std::error_code ec, size_t length) {
+		asio::async_write(socket, asio::buffer(&output.front().header, sizeof(MessageHeader<MessageType>)),
+				  [this](std::error_code ec, size_t length [[maybe_unused]]) {
 					  if (!ec) {
 						  if (output.front().body.size() > 0) {
 							  write_body();
@@ -91,7 +93,7 @@ public:
 	void write_body()
 	{
 		asio::async_write(socket, asio::buffer(output.front().body.data(), output.front().body.size()),
-				  [this](std::error_code ec, std::size_t length) {
+				  [this](std::error_code ec, size_t length [[maybe_unused]]) {
 					  if (!ec) {
 						  output.pop_front();
 
@@ -108,7 +110,7 @@ public:
 	void read_header()
 	{
 		asio::async_read(socket, asio::buffer(&tmp_input.header, sizeof(MessageHeader<MessageType>)),
-				 [this](std::error_code ec, std::size_t length) {
+				 [this](std::error_code ec, size_t length [[maybe_unused]]) {
 					 if (!ec) {
 						 if (tmp_input.header.size > 0) {
 							 tmp_input.body.resize(tmp_input.header.size);
@@ -126,7 +128,7 @@ public:
 	void read_body()
 	{
 		asio::async_read(socket, asio::buffer(tmp_input.body.data(), tmp_input.body.size()),
-				 [this](std::error_code ec, std::size_t length) {
+				 [this](std::error_code ec, size_t length [[maybe_unused]]) {
 					 if (!ec) {
 						 add_incoming_message();
 					 } else {
@@ -149,7 +151,7 @@ public:
 private:
 	asio::ip::tcp::socket socket;
 	asio::io_context &context;
-	Queue<Message<MessageType>> &input;
+	Queue<OwnedMessage<MessageType>> &input;
 	Queue<Message<MessageType>> output;
 	Message<MessageType> tmp_input;
 	owner owner_type = owner::server;
