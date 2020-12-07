@@ -5,8 +5,7 @@
 #include <memory>
 #include <thread>
 
-#include <asio.hpp>
-
+#include "../network_common.hpp"
 #include "../connection/connection.hpp"
 #include "../message/message.hpp"
 #include "../queue/queue.hpp"

@@ -2,8 +2,7 @@
 
 #include <iostream>
 
-#include <asio.hpp>
-
+#include "../network_common.hpp"
 #include "../message/message.hpp"
 #include "../queue/queue.hpp"
 
