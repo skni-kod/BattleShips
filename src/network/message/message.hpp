@@ -10,13 +10,13 @@ namespace network
 {
 
 template <typename MessageType> struct MessageHeader {
-	MessageType type;
-	size_t size;
+	MessageType type{};
+	size_t size = 0;
 };
 
 template <typename MessageType> struct Message {
-	MessageHeader<MessageType> header;
-	std::vector<std::uint8_t> body;
+	MessageHeader<MessageType> header{};
+	std::vector<uint8_t> body;
 
 	size_t size() const { return sizeof(header) + body.size(); }
 
