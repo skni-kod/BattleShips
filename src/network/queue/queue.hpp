@@ -12,7 +12,7 @@ template <typename T> class Queue
 {
 public:
 	Queue() = default;
-	Queue(const T &) = delete;
+	Queue(const Queue<T> &) = delete;
 	virtual ~Queue() { clear(); }
 
 	const T &front()
@@ -70,7 +70,7 @@ public:
 	size_t count()
 	{
 		std::scoped_lock lock(mux);
-		return deque.count();
+		return deque.size();
 	}
 
 	void clear()

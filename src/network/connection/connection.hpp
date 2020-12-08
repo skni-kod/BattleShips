@@ -58,10 +58,11 @@ public:
 
 	void send(const Message<MessageType> &msg)
 	{
+		std::cout << "Sending MessageType: " << std::to_string(static_cast<int>(msg.header.type)) << "\n";
 		asio::post(context, [this, msg]() {
-			bool writing = !output.empty();
+			bool currently_writing = !output.empty();
 			output.push_back(msg);
-			if (writing) {
+			if (!currently_writing) {
 				write_header();
 			}
 		});
