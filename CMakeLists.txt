@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.11) # FetchContent is available in 3.11+
 set(PROJECT_NAME battleships)
-project(${PROJECT_NAME} CXX)
+project(
+	${PROJECT_NAME}
+	DESCRIPTION "Multiplayer battleships game"
+	HOMEPAGE_URL "github.com/jaenek/battleships"
+	LANGUAGES C CXX
+)
 
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
