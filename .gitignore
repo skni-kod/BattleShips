@@ -1,6 +1,7 @@
 .git/
 .clangd/
 .vs/
+.cache/
 build/
-src/.cache/
 tags
+compile_commands.json
