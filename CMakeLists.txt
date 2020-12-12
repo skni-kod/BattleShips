@@ -3,7 +3,6 @@ project(
 	battleships
 	DESCRIPTION "Multiplayer battleships game"
 	HOMEPAGE_URL "github.com/jaenek/battleships"
-	LANGUAGES C CXX
 )
 
 add_library(project_options INTERFACE)
@@ -13,25 +12,6 @@ add_library(project_warnings INTERFACE)
 if(NOT MSVC)
 	include(cmake/Warnings.cmake)
 	set_project_warnings(project_warnings)
-endif()
-
-find_package(raylib 3.0.0 QUIET)
-if (NOT raylib_FOUND)
-	include(FetchContent)
-	FetchContent_Declare(
-		raylib
-		GIT_REPOSITORY https://github.com/raysan5/raylib.git
-		GIT_TAG bd512764ff7c82fa6e1395c51accb3ba18162827
-	)
-	FetchContent_GetProperties(raylib)
-	if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
-		set(FETCHCONTENT_QUIET NO)
-		FetchContent_Populate(raylib)
-		set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-		set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
-		set(BUILD_TESTING  OFF CACHE BOOL "" FORCE)
-		add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
-	endif()
 endif()
 
 find_package(raylib-cpp 3.0.1 QUIET)
@@ -48,9 +28,14 @@ if (NOT raylib-cpp_FOUND)
 		FetchContent_Populate(raylib-cpp)
 		set(BUILD_RAYLIB_CPP_EXAMPLES OFF CACHE BOOL "" FORCE)
 		set(BUILD_TESTING             OFF CACHE BOOL "" FORCE)
-		add_subdirectory(${raylib-cpp_SOURCE_DIR} ${raylib-cpp_BINARY_DIR})
+		set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+		set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
+		add_subdirectory(${raylib-cpp_SOURCE_DIR}/vendor/raylib)
 	endif()
 endif()
+add_library(raylib-cpp INTERFACE)
+target_link_libraries(raylib-cpp INTERFACE raylib)
+target_include_directories(raylib-cpp SYSTEM INTERFACE ${raylib-cpp_SOURCE_DIR}/include)
 
 find_package(asio 1.18.0 QUIET)
 if (NOT asio_FOUND)
@@ -67,7 +52,7 @@ if (NOT asio_FOUND)
 	endif()
 endif()
 add_library(asio INTERFACE)
-target_include_directories(asio INTERFACE ${asio_SOURCE_DIR}/asio/include)
+target_include_directories(asio SYSTEM INTERFACE ${asio_SOURCE_DIR}/asio/include)
 
 # This is the main part:
 file(GLOB PROJECT_SOURCES
@@ -76,4 +61,5 @@ file(GLOB PROJECT_SOURCES
 	src/game/*
 )
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
-target_link_libraries(${PROJECT_NAME} PRIVATE project_options project_warnings raylib raylib-cpp asio)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE project_options project_warnings raylib-cpp asio)
