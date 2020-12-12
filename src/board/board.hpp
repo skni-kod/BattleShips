@@ -3,9 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "Color.hpp"
-#include "Rectangle.hpp"
-#include "Vector2.hpp"
+#include "../common.hpp"
 
 class Board
 {

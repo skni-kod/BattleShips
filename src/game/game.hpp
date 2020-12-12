@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Color.hpp"
-#include "Mouse.hpp"
-#include "Window.hpp"
-
+#include "../common.hpp"
 #include "../board/board.hpp"
 
 class Game
