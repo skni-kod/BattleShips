@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "net/net.hpp"
+#include "../net/net.hpp"
 
 enum class CustomMsgTypes : uint32_t {
 	ServerAccept,
