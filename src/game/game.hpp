@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../common.hpp"
+#include <raylib.h>
+
 #include "../board/board.hpp"
 
 class Game

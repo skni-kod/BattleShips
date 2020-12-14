@@ -1,6 +1,6 @@
 #include <iostream>
+#include <raylib.h>
 
-#include "../common.hpp"
 #include "../net/net.hpp"
 
 enum class CustomMsgTypes : uint32_t {
@@ -36,19 +36,19 @@ public:
 
 int main()
 {
-	raylib::Window window(600, 400, "Client example");
+	InitWindow(600, 400, "Client example");
+	SetTargetFPS(60);
+	SetExitKey(KEY_Q);
 
 	CustomClient c;
 	c.connect("127.0.0.1", 60000);
 
 	bool quit = false;
-	while (!window.ShouldClose() && !quit) {
+	while (!WindowShouldClose()) {
 		if (IsKeyPressed(KEY_P))
 			c.PingServer();
 		if (IsKeyPressed(KEY_M))
 			c.MessageAll();
-		if (IsKeyPressed(KEY_Q))
-			quit = true;
 
 		if (c.is_connected()) {
 			if (!c.incoming().empty()) {
@@ -86,11 +86,11 @@ int main()
 			quit = true;
 		}
 
-		window.BeginDrawing();
+		BeginDrawing();
 
-		raylib::Color::LightGray.ClearBackground();
+		ClearBackground(LIGHTGRAY);
 
-		window.EndDrawing();
+		EndDrawing();
 	}
 
 	return 0;
