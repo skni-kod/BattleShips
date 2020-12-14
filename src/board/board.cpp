@@ -3,10 +3,10 @@
 Board::Board(unsigned int nrows, unsigned int ncols, float cell_w, float cell_h, float x, float y)
     : rows(nrows), cols(ncols)
 {
-	board = {x, y, static_cast<float>(rows * cell_w), static_cast<float>(cols * cell_h)};
+	board = {x, y, static_cast<float>(rows) * cell_w, static_cast<float>(cols) * cell_h};
 	for (unsigned int i = 0; i < rows * cols; i++) {
-		float cell_x = to_row(i) * cell_w + board.x;
-		float cell_y = to_col(i) * cell_h + board.y;
+		float cell_x = static_cast<float>(to_row(i)) * cell_w + board.x;
+		float cell_y = static_cast<float>(to_col(i)) * cell_h + board.y;
 		cells.push_back({cell_x, cell_y, cell_w, cell_h});
 	}
 }
