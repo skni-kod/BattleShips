@@ -34,6 +34,7 @@ if (NOT raylib-cpp_FOUND)
 	endif()
 endif()
 add_library(raylib-cpp INTERFACE)
+target_compile_options(raylib-cpp INTERFACE -DGRAPHICS="GRAPHICS_API_OPENGL_11")
 target_link_libraries(raylib-cpp INTERFACE raylib)
 target_include_directories(raylib-cpp SYSTEM INTERFACE ${raylib-cpp_SOURCE_DIR}/include)
 
