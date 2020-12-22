@@ -7,22 +7,32 @@ void Game::loop()
 
 	Board<10> board(400, 400, 100, 40);
 
-	while (!WindowShouldClose()) {
-		auto mouse_pos = GetMousePosition();
+	std::array<bool, 100> a {
+		0,0,0,0,0,0,0,0,0,1,
+		0,0,0,0,0,0,0,0,1,0,
+		0,0,0,0,0,0,0,1,0,0,
+		0,0,0,0,0,0,1,0,0,0,
+		0,0,0,0,0,1,0,0,0,0,
+		0,0,0,0,1,0,0,0,0,0,
+		0,0,0,1,0,0,0,0,0,0,
+		0,0,1,0,0,0,0,0,0,0,
+		0,1,0,0,0,0,0,0,0,0,
+		1,0,0,0,0,0,0,0,0,0,
+	};
 
-		auto mouse_index = board.update_highlight(mouse_pos);
+	board.selected_cells = a;
+
+	while (!WindowShouldClose()) {
+		board.update_highlight();
 
 		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
-			board.update_selected(mouse_pos);
+			board.update_selected();
 
 		BeginDrawing();
 
 		ClearBackground(LIGHTGRAY);
 
 		board.draw();
-
-		DrawText(TextFormat("x: %f\ty: %f\n", static_cast<double>(mouse_pos.x), static_cast<double>(mouse_pos.y)), 20, 20, 40, BLACK);
-		DrawText(TextFormat("i: %u", mouse_index), 20, 60, 40, BLACK);
 
 		EndDrawing();
 	}
