@@ -1,14 +1,14 @@
-#include "game.hpp"
+#include "main_window.hpp"
 
-void Game::loop()
+void main_window::loop()
 {
 	InitWindow(window_width, window_height, "Battleships");
 	SetTargetFPS(60);
 
-	Board<10> board(400, 400, 100, 40);
+	game_board<10> board(400, 400, 100, 40);
 
 	std::array<bool, 100> a {
-		0,0,0,0,0,0,0,0,0,1,
+		1,0,0,0,0,0,0,0,0,1,
 		0,0,0,0,0,0,0,0,1,0,
 		0,0,0,0,0,0,0,1,0,0,
 		0,0,0,0,0,0,1,0,0,0,
@@ -22,7 +22,17 @@ void Game::loop()
 
 	board.selected_cells = a;
 
-	while (!WindowShouldClose()) {
+	net_client<10> c(board.selected_cells);
+	c.connect("127.0.0.1", 60000);
+
+	bool quit = false;
+	while (!WindowShouldClose() & !quit) {
+		if (IsKeyPressed(KEY_ENTER))
+			c.send_board_state();
+
+		// loop returns true on connection error
+		if (c.loop()) quit = true;
+
 		board.update_highlight();
 
 		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
@@ -36,4 +46,6 @@ void Game::loop()
 
 		EndDrawing();
 	}
+
+	CloseWindow();
 }

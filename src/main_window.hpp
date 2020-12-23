@@ -2,9 +2,10 @@
 
 #include <raylib.h>
 
-#include "../board/board.hpp"
+#include "game_board.hpp"
+#include "net/client_impl.hpp"
 
-class Game
+class main_window
 {
 public:
 	void loop();
