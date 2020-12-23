@@ -1,6 +1,9 @@
-.PHONY: all configure build
+.PHONY: all clean configure build
 
 all: build
+
+clean:
+	rm -rf build
 
 configure:
 	mkdir -pv build
@@ -8,4 +11,4 @@ configure:
 	cp build/compile_commands.json src/
 
 build:
-	cd build && make && ./battleships
+	cd build && make

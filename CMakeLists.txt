@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11) # FetchContent is available in 3.11+
 project(
 	battleships
 	DESCRIPTION "Multiplayer battleships game"
-	HOMEPAGE_URL "github.com/jaenek/battleships"
+	HOMEPAGE_URL "github.com/skni-kod/battleships"
 )
 
 add_library(project_options INTERFACE)
@@ -14,29 +14,26 @@ if(NOT MSVC)
 	set_project_warnings(project_warnings)
 endif()
 
-find_package(raylib-cpp 3.0.1 QUIET)
-if (NOT raylib-cpp_FOUND)
-	include(FetchContent)
-	FetchContent_Declare(
-		raylib-cpp
-		GIT_REPOSITORY https://github.com/RobLoach/raylib-cpp.git
-		GIT_TAG ebb379029bd8f73dc42791f5d8fc9c9e607ffd1a
-	)
-	FetchContent_GetProperties(raylib-cpp)
-	if (NOT raylib-cpp_POPULATED)
-		set(FETCHCONTENT_QUIET NO)
-		FetchContent_Populate(raylib-cpp)
-		set(BUILD_RAYLIB_CPP_EXAMPLES OFF CACHE BOOL "" FORCE)
-		set(BUILD_TESTING             OFF CACHE BOOL "" FORCE)
-		set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-		set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
-		add_subdirectory(${raylib-cpp_SOURCE_DIR}/vendor/raylib)
-	endif()
+set(THREADS_PREFER_PTHREAD_FLAG OFF)
+find_package(Threads)
+
+if (NOT raylib_FOUND)
+  include(FetchContent)
+  FetchContent_Declare(
+    raylib
+    URL https://github.com/raysan5/raylib/archive/master.tar.gz
+  )
+
+  FetchContent_GetProperties(raylib)
+  if (NOT raylib_POPULATED)
+    set(FETCHCONTENT_QUIET NO)
+    FetchContent_Populate(raylib)
+
+    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+	set(GRAPHICS="GRAPHICS_API_OPENGL_11")
+    add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
+  endif()
 endif()
-add_library(raylib-cpp INTERFACE)
-target_compile_options(raylib-cpp INTERFACE -DGRAPHICS="GRAPHICS_API_OPENGL_11")
-target_link_libraries(raylib-cpp INTERFACE raylib)
-target_include_directories(raylib-cpp SYSTEM INTERFACE ${raylib-cpp_SOURCE_DIR}/include)
 
 find_package(asio 1.18.0 QUIET)
 if (NOT asio_FOUND)
@@ -54,6 +51,7 @@ if (NOT asio_FOUND)
 endif()
 add_library(asio INTERFACE)
 target_include_directories(asio SYSTEM INTERFACE ${asio_SOURCE_DIR}/asio/include)
+target_link_libraries(asio INTERFACE Threads::Threads)
 
 # This is the main part:
 file(GLOB PROJECT_SOURCES
@@ -61,6 +59,10 @@ file(GLOB PROJECT_SOURCES
 	src/board/*
 	src/game/*
 )
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+add_executable(${PROJECT_NAME}_client ${PROJECT_SOURCES})
+target_compile_definitions(${PROJECT_NAME}_client PRIVATE CLIENT)
+target_link_libraries(${PROJECT_NAME}_client PRIVATE project_options project_warnings raylib asio)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE project_options project_warnings raylib-cpp asio)
+add_executable(${PROJECT_NAME}_server src/main.cpp)
+target_compile_definitions(${PROJECT_NAME}_server PRIVATE SERVER)
+target_link_libraries(${PROJECT_NAME}_server PRIVATE project_options project_warnings asio)
