@@ -9,36 +9,33 @@ add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
 
 add_library(project_warnings INTERFACE)
-if(NOT MSVC)
-	include(cmake/Warnings.cmake)
-	set_project_warnings(project_warnings)
-endif()
+include(cmake/Warnings.cmake)
+set_project_warnings(project_warnings)
 
+include(FetchContent)
+
+find_package(raylib 3.0 QUIET)
 if (NOT raylib_FOUND)
-  include(FetchContent)
-  FetchContent_Declare(
-    raylib
-    URL https://github.com/raysan5/raylib/archive/master.tar.gz
-  )
+	FetchContent_Declare(
+		raylib
+		URL https://github.com/raysan5/raylib/archive/master.tar.gz
+	)
 
-  FetchContent_GetProperties(raylib)
-  if (NOT raylib_POPULATED)
-    set(FETCHCONTENT_QUIET NO)
-    FetchContent_Populate(raylib)
-
-    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-	set(GRAPHICS="GRAPHICS_API_OPENGL_11")
-    add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
-  endif()
+	FetchContent_GetProperties(raylib)
+	if (NOT raylib_POPULATED)
+		set(FETCHCONTENT_QUIET NO)
+		FetchContent_Populate(raylib)
+		set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+		add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
+	endif()
 endif()
 
 find_package(asio 1.18.0 QUIET)
 if (NOT asio_FOUND)
-	include(FetchContent)
 	FetchContent_Declare(
 		asio
 		GIT_REPOSITORY https://github.com/chriskohlhoff/asio
-		GIT_TAG be7badc31abcc395cf868de6a1e240c2350bdbf2
+		GIT_TAG asio-1-18-0
 	)
 	FetchContent_GetProperties(asio)
 	if (NOT asio_POPULATED)
@@ -47,9 +44,13 @@ if (NOT asio_FOUND)
 	endif()
 endif()
 add_library(asio INTERFACE)
-target_include_directories(asio SYSTEM INTERFACE ${asio_SOURCE_DIR}/asio/include)
 find_package(Threads)
 target_link_libraries(asio INTERFACE Threads::Threads)
+if(MSVC)
+	target_compile_options(asio INTERFACE -DASIO_STANDALONE /experimental:external /external:W0 /external:I ${asio_SOURCE_DIR}/asio/include)
+else()
+	target_include_directories(asio SYSTEM INTERFACE ${asio_SOURCE_DIR}/asio/include)
+endif()
 
 # This is the main part:
 file(GLOB PROJECT_SOURCES
