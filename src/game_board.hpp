@@ -10,7 +10,7 @@ public:
 	std::array<bool, num_cells * num_cells> selected_cells{};
 
 	game_board(float width, float height, float x = 0, float y = 0)
-	    : bounds{x, y, width, height}, cell_w(width / num_cells), cell_h(height / num_cells)
+	    : bounds{x, y, width-1, height-1}, cell_w(width / num_cells), cell_h(height / num_cells)
 	{
 		uint32_t row = 0, col = 0;
 		for (auto &cell : cells) {
@@ -51,19 +51,18 @@ public:
 		if (highlight)
 			DrawRectangleLinesEx(cells[to_index(mouse_pos)], 2, highlighted_color);
 
-		uint32_t i = UINT32_MAX;
+		uint32_t i = 0;
 		for (auto &selected : selected_cells) {
+			if (selected) {
+				Vector2 top_left = {cells[i].x + 2, cells[i].y + 2};
+				Vector2 bottom_right = {cells[i].x + cells[i].width - 2, cells[i].y + cells[i].height - 2};
+				DrawLineV(top_left, bottom_right, selected_color);
+
+				Vector2 top_right = {cells[i].x + 2, cells[i].y + cells[i].height - 2};
+				Vector2 bottom_left = {cells[i].x + cells[i].width - 2, cells[i].y + 2};
+				DrawLineV(top_right, bottom_left, selected_color);
+			}
 			i++;
-			if (!selected)
-				continue;
-
-			Vector2 top_left = {cells[i].x + 2, cells[i].y + 2};
-			Vector2 bottom_right = {cells[i].x + cells[i].width - 2, cells[i].y + cells[i].height - 2};
-			DrawLineV(top_left, bottom_right, selected_color);
-
-			Vector2 top_right = {cells[i].x + 2, cells[i].y + cells[i].height - 2};
-			Vector2 bottom_left = {cells[i].x + cells[i].width - 2, cells[i].y + 2};
-			DrawLineV(top_right, bottom_left, selected_color);
 		}
 	}
 
