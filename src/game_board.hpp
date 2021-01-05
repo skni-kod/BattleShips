@@ -1,10 +1,8 @@
 #pragma once
 
-#include <algorithm>
+#include <array>
 #include <cstdint>
-#include <iostream>
 #include <raylib.h>
-#include <vector>
 
 template <uint32_t num_cells> class game_board
 {
@@ -35,7 +33,6 @@ public:
 		else
 			highlight = false;
 	}
-
 
 	void update_selected()
 	{
@@ -69,7 +66,6 @@ public:
 			DrawLineV(top_right, bottom_left, selected_color);
 		}
 	}
-
 
 private:
 	Rectangle bounds;
