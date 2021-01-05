@@ -1,5 +1,5 @@
 #ifdef CLIENT
-#include "main_window.hpp"
+#include "windows/main_window.hpp"
 
 int main()
 {

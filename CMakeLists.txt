@@ -54,7 +54,8 @@ endif()
 
 # This is the main part:
 file(GLOB PROJECT_SOURCES
-	src/*.cpp
+	src/main.cpp
+	src/windows/main_window.cpp
 )
 add_executable(${PROJECT_NAME}_client ${PROJECT_SOURCES})
 target_compile_definitions(${PROJECT_NAME}_client PRIVATE CLIENT)

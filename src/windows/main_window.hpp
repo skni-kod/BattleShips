@@ -2,8 +2,8 @@
 
 #include <raylib.h>
 
-#include "game_board.hpp"
-#include "net/client_impl.hpp"
+#include "../game/game_board.hpp"
+#include "../net/client_impl.hpp"
 
 class main_window
 {
