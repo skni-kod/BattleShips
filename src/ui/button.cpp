@@ -1,6 +1,6 @@
 #include "button.hpp"
 
-button::button(Rectangle rect) : bounds(rect)
+button::button(Rectangle rect, std::string btn_label) : bounds(rect), label(btn_label)
 {
 }
 

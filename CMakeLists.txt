@@ -55,9 +55,10 @@ endif()
 
 # This is the main part:
 file(GLOB PROJECT_SOURCES
-	src/main.cpp
+	src/ui/button.cpp
+	src/ui/selection.cpp
 	src/main_window/main_window.cpp
-	src/main_window/button/button.cpp
+	src/main.cpp
 )
 add_executable(${PROJECT_NAME}_client ${PROJECT_SOURCES})
 target_compile_definitions(${PROJECT_NAME}_client PRIVATE CLIENT)

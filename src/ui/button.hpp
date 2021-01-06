@@ -1,23 +1,22 @@
 #pragma once
 
-#include <raylib.h>
 #include <functional>
+#include <raylib.h>
 #include <string>
 
-class button {
+class button
+{
 public:
-	std::function<void()> action;
+	Rectangle bounds;
 	std::string label;
+	std::function<void()> action;
 	int font_size = 20;
 	Color label_color = BLACK;
 	Color bg_color = GREEN;
 
-	button(Rectangle rect);
+	button(Rectangle rect, std::string button_label);
 
 	void update();
 
 	void draw();
-
-private:
-	Rectangle bounds;
 };
