@@ -26,6 +26,7 @@ if (NOT raylib_FOUND)
 		set(FETCHCONTENT_QUIET NO)
 		FetchContent_Populate(raylib)
 		set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+		set(GRAPHICS="GRAPHICS_API_OPENGL_11")
 		add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
 	endif()
 endif()
@@ -56,6 +57,7 @@ endif()
 file(GLOB PROJECT_SOURCES
 	src/main.cpp
 	src/main_window/main_window.cpp
+	src/main_window/button/button.cpp
 )
 add_executable(${PROJECT_NAME}_client ${PROJECT_SOURCES})
 target_compile_definitions(${PROJECT_NAME}_client PRIVATE CLIENT)
