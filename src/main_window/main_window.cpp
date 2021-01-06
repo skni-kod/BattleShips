@@ -12,12 +12,14 @@ void main_window::loop()
 {
 	while (!WindowShouldClose() & !quit) {
 		switch (current_window) {
+		case window_type::MENU_INIT:
+			menu_init();
+			break;
 		case window_type::MENU:
 			menu_update();
 			break;
-		case window_type::CONNECT:
-			client.connect(hostname, port);
-			current_window = window_type::GAME;
+		case window_type::GAME_INIT:
+			game_init();
 			break;
 		case window_type::GAME:
 			game_update();
@@ -25,9 +27,10 @@ void main_window::loop()
 		default:
 			break;
 		}
+
 		BeginDrawing();
 
-		ClearBackground(LIGHTGRAY);
+		ClearBackground(BLACK);
 		switch (current_window) {
 		case window_type::MENU:
 			menu_draw();
@@ -43,15 +46,30 @@ void main_window::loop()
 	}
 }
 
+void main_window::menu_init()
+{
+	connect_btn.label = "CONNECT";
+	connect_btn.action = [&current_window = current_window]() { current_window = window_type::GAME_INIT; };
+	current_window = window_type::MENU;
+}
+
 void main_window::menu_update()
 {
 	// update input
 	// if clicked fill respective fields
+	connect_btn.update();
 }
 
 void main_window::menu_draw()
 {
 	// draw input
+	connect_btn.draw();
+}
+
+void main_window::game_init()
+{
+	client.connect(hostname, port);
+	current_window = window_type::GAME;
 }
 
 void main_window::game_update()
