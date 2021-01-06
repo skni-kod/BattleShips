@@ -4,7 +4,7 @@
 
 #include "../game/game_board.hpp"
 #include "../net/client_impl.hpp"
-#include "button/button.hpp"
+#include "../ui/button.hpp"
 
 enum class window_type { MENU_INIT, MENU, GAME_INIT, GAME, GAMEOVER };
 
