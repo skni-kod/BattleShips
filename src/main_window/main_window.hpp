@@ -1,10 +1,12 @@
 #pragma once
 
 #include <raylib.h>
+#include <string>
 
 #include "../game/game_board.hpp"
 #include "../net/client_impl.hpp"
 #include "../ui/button.hpp"
+#include "../ui/selection.hpp"
 
 enum class window_type { MENU_INIT, MENU, GAME_INIT, GAME, GAMEOVER };
 
@@ -39,5 +41,15 @@ private:
 	std::string hostname = "127.0.0.1";
 	uint16_t port = 60000;
 
-	button connect_btn{{(window_width - 100)/2, (window_height - 50)/2, 100, 50}};
+	uint8_t submarines_count = 2;
+	selection select_submarines{ {200, 150}, "Submarines: %d ", submarines_count};
+	uint8_t destroyer_count = 2;
+	selection select_destroyers{ {200, 180}, "Destroyers: %d ", destroyer_count};
+	uint8_t cruiser_count = 1;
+	selection select_cruisers{   {200, 210}, "Cruisers: %d   ", cruiser_count};
+	uint8_t battleship_count = 1;
+	selection select_battleships{{200, 240}, "Battleships: %d", battleship_count};
+	uint8_t carrier_count = 1;
+	selection select_carriers{   {200, 270}, "Carriers: %d   ", carrier_count};
+	button connect_btn{{200, 330, 200, 50}, "CONNECT"};
 };

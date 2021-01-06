@@ -48,21 +48,28 @@ void main_window::loop()
 
 void main_window::menu_init()
 {
-	connect_btn.label = "CONNECT";
 	connect_btn.action = [&current_window = current_window]() { current_window = window_type::GAME_INIT; };
+
 	current_window = window_type::MENU;
 }
 
 void main_window::menu_update()
 {
-	// update input
-	// if clicked fill respective fields
+	select_submarines.update();
+	select_destroyers.update();
+	select_cruisers.update();
+	select_battleships.update();
+	select_carriers.update();
 	connect_btn.update();
 }
 
 void main_window::menu_draw()
 {
-	// draw input
+	select_submarines.draw();
+	select_destroyers.draw();
+	select_cruisers.draw();
+	select_battleships.draw();
+	select_carriers.draw();
 	connect_btn.draw();
 }
 
