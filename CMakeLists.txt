@@ -57,6 +57,7 @@ endif()
 file(GLOB PROJECT_SOURCES
 	src/ui/button.cpp
 	src/ui/selection.cpp
+	src/game/game_board.cpp
 	src/main_window/main_window.cpp
 	src/main.cpp
 )
