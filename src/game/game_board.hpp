@@ -1,21 +1,26 @@
 #pragma once
 
-#include <array>
+#include <algorithm>
 #include <cstdint>
 #include <raylib.h>
+#include <vector>
 
-template <uint32_t num_cells> class game_board
+class game_board
 {
 public:
-	std::array<bool, num_cells * num_cells> selected_cells{};
+	std::vector<uint32_t> selected_cells{};
 
-	game_board(float width, float height, float x = 0, float y = 0)
-	    : bounds{x, y, width-1, height-1}, cell_w(width / num_cells), cell_h(height / num_cells)
+	game_board(Rectangle rect, uint8_t cells_per_slice)
+	    : bounds{rect.x, rect.y, rect.width - 1, rect.height - 1}, num_cells(cells_per_slice)
 	{
+		cell_w = rect.width / num_cells;
+		cell_h = rect.height / num_cells;
+
+		cells.resize(num_cells * num_cells);
+
 		uint32_t row = 0, col = 0;
 		for (auto &cell : cells) {
-			cell = {x + cell_w * static_cast<float>(col), y + cell_h * static_cast<float>(row), cell_w,
-				cell_h};
+			cell = {rect.x + cell_w * static_cast<float>(col), rect.y + cell_h * static_cast<float>(row)};
 
 			col++;
 			if (col % num_cells == 0) {
@@ -37,39 +42,43 @@ public:
 	void update_selected()
 	{
 		if (CheckCollisionPointRec(mouse_pos, bounds)) {
-			auto index = to_index(mouse_pos);
-			selected_cells[index] = !selected_cells[index];
+			auto cell_index = to_index(mouse_pos);
+
+			if (const auto pos = std::find(selected_cells.begin(), selected_cells.end(), cell_index); pos != std::end(selected_cells))
+				selected_cells.erase(pos);
+			else
+				selected_cells.push_back(cell_index);
+
 		}
 	}
 
 	void draw()
 	{
 		for (auto &cell : cells) {
-			DrawRectangleLinesEx(cell, 1, normal_color);
+			DrawRectangleLinesEx({cell.x, cell.y, cell_w, cell_h}, 2, normal_color);
 		}
 
-		if (highlight)
-			DrawRectangleLinesEx(cells[to_index(mouse_pos)], 2, highlighted_color);
+		if (highlight) {
+			auto i = to_index(GetMousePosition());
+			DrawRectangleLinesEx({cells[i].x, cells[i].y, cell_w, cell_h}, 2, highlighted_color);
+		}
 
-		uint32_t i = 0;
-		for (auto &selected : selected_cells) {
-			if (selected) {
-				Vector2 top_left = {cells[i].x + 2, cells[i].y + 2};
-				Vector2 bottom_right = {cells[i].x + cells[i].width - 2, cells[i].y + cells[i].height - 2};
-				DrawLineV(top_left, bottom_right, selected_color);
+		for (auto &i : selected_cells) {
+			Vector2 top_left = {cells[i].x + 2, cells[i].y + 2};
+			Vector2 bottom_right = {cells[i].x + cell_w - 2, cells[i].y + cell_h - 2};
+			DrawLineV(top_left, bottom_right, selected_color);
 
-				Vector2 top_right = {cells[i].x + 2, cells[i].y + cells[i].height - 2};
-				Vector2 bottom_left = {cells[i].x + cells[i].width - 2, cells[i].y + 2};
-				DrawLineV(top_right, bottom_left, selected_color);
-			}
-			i++;
+			Vector2 top_right = {cells[i].x + 2, cells[i].y + cell_h - 2};
+			Vector2 bottom_left = {cells[i].x + cell_w - 2, cells[i].y + 2};
+			DrawLineV(top_right, bottom_left, selected_color);
 		}
 	}
 
 private:
 	Rectangle bounds;
 	float cell_w, cell_h;
-	std::array<Rectangle, num_cells * num_cells> cells;
+	uint8_t num_cells;
+	std::vector<Vector2> cells;
 
 	Vector2 mouse_pos;
 	bool highlight = false;

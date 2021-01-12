@@ -35,7 +35,7 @@ private:
 	void game_draw();
 
 	window_type current_window = window_type::MENU_INIT;
-	game_board board{{400, 400, 100, 40}, NUM_CELLS};
+	game_board board{{100, 40, 400, 400}, NUM_CELLS};
 	net_client client{board.selected_cells};
 
 	bool quit = false;
