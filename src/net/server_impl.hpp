@@ -25,9 +25,9 @@ private:
 	virtual void on_message(std::shared_ptr<net::connection<message_type>> client, net::message<message_type> &msg)
 	{
 		switch (msg.header.id) {
-		case message_type::send_board_state: {
+		case message_type::send_guess: {
 			std::cout << "[" << client->get_id() << "]: Sending Board State\n";
-			msg.header.id = message_type::recv_board_state;
+			msg.header.id = message_type::recv_guess;
 			message_all_clients(msg, client);
 		} break;
 

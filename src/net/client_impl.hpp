@@ -1,19 +1,21 @@
 #pragma once
+
 #include <iostream>
 
-#include "net.hpp"
 #include "message_type.hpp"
+#include "net.hpp"
 
-template <uint32_t num_cells> class net_client : public net::client_interface<message_type>
+class net_client : public net::client_interface<message_type>
 {
 public:
-	net_client(std::array<bool, num_cells * num_cells> &selected_cells) : board_state(selected_cells){};
+	net_client(std::vector<uint32_t> &selected_cells) : board_state(selected_cells){};
+
 	void send_board_state()
 	{
 		net::message<message_type> msg;
-		msg.header.id = message_type::send_board_state;
+		msg.header.id = message_type::send_guess;
 
-		msg << board_state;
+		msg << board_state[board_state.size() - 1];
 		send(msg);
 	}
 
@@ -32,12 +34,15 @@ public:
 					std::cout << "Server Denied Connection" << std::endl;
 				} break;
 
-				case message_type::recv_board_state: {
+				case message_type::recv_guess: {
 					std::cout << "Recived board state" << std::endl;
-					msg >> board_state;
+					uint32_t guess;
+					msg >> guess;
+					board_state.push_back(guess);
 				} break;
 
-				default: break;
+				default:
+					break;
 				}
 			}
 		} else {
@@ -48,5 +53,5 @@ public:
 	}
 
 private:
-	std::array<bool, num_cells * num_cells> &board_state;
+	std::vector<uint32_t> &board_state;
 };

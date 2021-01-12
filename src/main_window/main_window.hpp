@@ -8,6 +8,8 @@
 #include "../ui/button.hpp"
 #include "../ui/selection.hpp"
 
+static const uint8_t NUM_CELLS = 10;
+
 enum class window_type { MENU_INIT, MENU, GAME_INIT, GAME, GAMEOVER };
 
 class main_window
@@ -33,8 +35,8 @@ private:
 	void game_draw();
 
 	window_type current_window = window_type::MENU_INIT;
-	game_board<10> board{400, 400, 100, 40};
-	net_client<10> client{board.selected_cells};
+	game_board board{{400, 400, 100, 40}, NUM_CELLS};
+	net_client client{board.selected_cells};
 
 	bool quit = false;
 	static constexpr int window_width = 600, window_height = 480;
