@@ -11,6 +11,7 @@ public:
 private:
 	virtual bool on_client_connect(std::shared_ptr<net::connection<message_type>> client)
 	{
+		// check how many clients
 		net::message<message_type> msg;
 		msg.header.id = message_type::accept;
 		client->send(msg);
@@ -28,6 +29,11 @@ private:
 		case message_type::send_guess: {
 			std::cout << "[" << client->get_id() << "]: Sending Board State\n";
 			msg.header.id = message_type::recv_guess;
+			message_all_clients(msg, client);
+		} break;
+
+		case message_type::start: {
+			std::cout << "[" << client->get_id() << "]: Starting\n";
 			message_all_clients(msg, client);
 		} break;
 

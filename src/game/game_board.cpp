@@ -32,28 +32,34 @@ void game_board::update_highlight()
 void game_board::update_selected()
 {
 	if (CheckCollisionPointRec(mouse_pos, bounds)) {
-		auto cell_index = to_index(mouse_pos);
+		const auto cell_index = to_index(mouse_pos);
+		auto result = std::find(selected_cells.begin(), selected_cells.end(), cell_index);
 
-		if (const auto pos = std::find(selected_cells.begin(), selected_cells.end(), cell_index); pos != std::end(selected_cells))
-			selected_cells.erase(pos);
-		else
+		if (selected_cells.size() == 0) {
 			selected_cells.push_back(cell_index);
-
+			has_guess = false;
+		} else if (has_guess && result == selected_cells.end()) {
+			selected_cells.push_back(cell_index);
+			has_guess = false;
+		} else if (!has_guess && cell_index == selected_cells.back()) {
+			selected_cells.erase(selected_cells.end()-1);
+			has_guess = true;
+		}
 	}
 }
 
 void game_board::draw() const
 {
-	for (auto &cell : cells) {
+	for (const auto &cell : cells) {
 		DrawRectangleLinesEx({cell.x, cell.y, cell_w, cell_h}, 2, normal_color);
 	}
 
 	if (highlight) {
-		auto i = to_index(mouse_pos);
+		const auto i = to_index(mouse_pos);
 		DrawRectangleLinesEx({cells[i].x, cells[i].y, cell_w, cell_h}, 2, highlighted_color);
 	}
 
-	for (auto &i : selected_cells) {
+	for (const auto i : selected_cells) {
 		Vector2 top_left = {cells[i].x + 2, cells[i].y + 2};
 		Vector2 bottom_right = {cells[i].x + cell_w - 2, cells[i].y + cell_h - 2};
 		DrawLineV(top_left, bottom_right, selected_color);
@@ -62,6 +68,14 @@ void game_board::draw() const
 		Vector2 bottom_left = {cells[i].x + cell_w - 2, cells[i].y + 2};
 		DrawLineV(top_right, bottom_left, selected_color);
 	}
+}
+
+void game_board::guess(uint32_t guess)
+{
+	// check if good
+	// add to guesses
+	std::cout << "Opponents guessed: " << guess << std::endl;
+	has_guess = true;
 }
 
 uint32_t game_board::to_index(const Vector2 &v) const

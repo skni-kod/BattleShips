@@ -10,7 +10,7 @@
 
 static const uint8_t NUM_CELLS = 10;
 
-enum class window_type { MENU_INIT, MENU, GAME_INIT, GAME, GAMEOVER };
+enum class window_type { MENU_INIT, MENU, BOARD_INIT, BOARD, WAIT_INIT, WAIT, GAMEOVER };
 
 class main_window
 {
@@ -28,15 +28,27 @@ private:
 
 	void menu_draw();
 
-	void game_init();
+	void board_init();
 
-	void game_update();
+	void board_update();
 
-	void game_draw();
+	void board_draw();
+
+	void wait_update();
+
+	void wait_draw();
 
 	window_type current_window = window_type::MENU_INIT;
 	game_board board{{100, 40, 400, 400}, NUM_CELLS};
-	net_client client{board.selected_cells};
+	net_client client{
+	[this](){
+		current_window = window_type::BOARD;
+		board.has_guess = true;
+	},
+	[this](uint32_t guess){
+		current_window = window_type::BOARD;
+		board.guess(guess);
+	}};
 
 	bool quit = false;
 	static constexpr int window_width = 600, window_height = 480;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <iostream>
 
 #include "message_type.hpp"
@@ -8,14 +9,22 @@
 class net_client : public net::client_interface<message_type>
 {
 public:
-	net_client(std::vector<uint32_t> &selected_cells) : board_state(selected_cells){};
+	net_client(std::function<void()> on_start_func, std::function<void(uint32_t guess)> on_recieve_func)
+	    : on_start(on_start_func), on_recieve(on_recieve_func){};
 
-	void send_board_state()
+	void start()
+	{
+		net::message<message_type> msg;
+		msg.header.id = message_type::start;
+		send(msg);
+	}
+
+	void send_guess(uint32_t guess)
 	{
 		net::message<message_type> msg;
 		msg.header.id = message_type::send_guess;
 
-		msg << board_state[board_state.size() - 1];
+		msg << guess;
 		send(msg);
 	}
 
@@ -34,11 +43,16 @@ public:
 					std::cout << "Server Denied Connection" << std::endl;
 				} break;
 
+				case message_type::start: {
+					std::cout << "Starting Game" << std::endl;
+					on_start();
+				} break;
+
 				case message_type::recv_guess: {
-					std::cout << "Recived board state" << std::endl;
+					std::cout << "Recived Guess" << std::endl;
 					uint32_t guess;
 					msg >> guess;
-					board_state.push_back(guess);
+					on_recieve(guess);
 				} break;
 
 				default:
@@ -53,5 +67,6 @@ public:
 	}
 
 private:
-	std::vector<uint32_t> &board_state;
+	std::function<void()> on_start;
+	std::function<void(uint32_t guess)> on_recieve;
 };

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <iostream>
 #include <raylib.h>
 #include <vector>
 
@@ -9,6 +10,7 @@ class game_board
 {
 public:
 	std::vector<uint32_t> selected_cells{};
+	bool has_guess = false;
 
 	game_board(Rectangle rect, uint8_t cells_per_slice);
 
@@ -17,6 +19,8 @@ public:
 	void update_selected();
 
 	void draw() const;
+
+	void guess(uint32_t guess);
 
 private:
 	Rectangle bounds;

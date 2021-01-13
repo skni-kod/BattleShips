@@ -15,15 +15,23 @@ void main_window::loop()
 		case window_type::MENU_INIT:
 			menu_init();
 			break;
+
 		case window_type::MENU:
 			menu_update();
 			break;
-		case window_type::GAME_INIT:
-			game_init();
+
+		case window_type::BOARD_INIT:
+			board_init();
 			break;
-		case window_type::GAME:
-			game_update();
+
+		case window_type::BOARD:
+			board_update();
 			break;
+
+		case window_type::WAIT:
+			wait_update();
+			break;
+
 		default:
 			break;
 		}
@@ -35,9 +43,15 @@ void main_window::loop()
 		case window_type::MENU:
 			menu_draw();
 			break;
-		case window_type::GAME:
-			game_draw();
+
+		case window_type::BOARD:
+			board_draw();
 			break;
+
+		case window_type::WAIT:
+			wait_draw();
+			break;
+
 		default:
 			break;
 		}
@@ -48,7 +62,7 @@ void main_window::loop()
 
 void main_window::menu_init()
 {
-	connect_btn.action = [&current_window = current_window]() { current_window = window_type::GAME_INIT; };
+	connect_btn.action = [&current_window = current_window]() { current_window = window_type::BOARD_INIT; };
 
 	current_window = window_type::MENU;
 }
@@ -73,17 +87,24 @@ void main_window::menu_draw()
 	connect_btn.draw();
 }
 
-void main_window::game_init()
+void main_window::board_init()
 {
 	client.connect(hostname, port);
-	current_window = window_type::GAME;
+	client.start();
+	current_window = window_type::WAIT;
 }
 
-void main_window::game_update()
+void main_window::board_update()
 {
-
-	if (IsKeyPressed(KEY_ENTER))
-		client.send_board_state();
+	if (IsKeyPressed(KEY_ENTER)) {
+		if (!board.has_guess) {
+			client.send_guess(board.selected_cells[board.selected_cells.size()-1]);
+			current_window = window_type::WAIT;
+		} else {
+			//warn about not guessing
+			std::cout << "Guess befor ending your turn!" << std::endl;
+		}
+	}
 
 	// loop returns true on connection error
 	if (client.loop())
@@ -95,4 +116,17 @@ void main_window::game_update()
 		board.update_selected();
 }
 
-void main_window::game_draw() { board.draw(); }
+void main_window::board_draw() { board.draw(); }
+
+void main_window::wait_update()
+{
+	// loop returns true on connection error
+	if (client.loop())
+		quit = true;
+}
+
+void main_window::wait_draw()
+{
+	const char *message = "Opponents turn";
+	DrawText(message, (window_width - MeasureText(message, 20)) / 2, window_height / 2 - 10, 20, RAYWHITE);
+}
