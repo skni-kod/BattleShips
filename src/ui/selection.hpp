@@ -8,7 +8,7 @@ public:
 	std::string label_format;
 	Color label_color = DARKGREEN;
 
-	selection(Vector2 vec, std::string selection_label_format, u_int8_t &selection_counter);
+	selection(Vector2 vec, std::string selection_label_format, uint8_t &selection_counter);
 
 	void update();
 
@@ -19,5 +19,5 @@ private:
 	const int font_size = 20;
 	button btn1;
 	button btn2;
-	u_int8_t &counter;
+	uint8_t &counter;
 };
