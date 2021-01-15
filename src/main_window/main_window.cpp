@@ -98,7 +98,7 @@ void main_window::board_update()
 {
 	if (IsKeyPressed(KEY_ENTER)) {
 		if (!board.has_guess) {
-			client.send_guess(board.selected_cells[board.selected_cells.size()-1]);
+			client.send_guess(board.get_guess());
 			current_window = window_type::WAIT;
 		} else {
 			//warn about not guessing

@@ -33,19 +33,34 @@ void game_board::update_selected()
 {
 	if (CheckCollisionPointRec(mouse_pos, bounds)) {
 		const auto cell_index = to_index(mouse_pos);
-		auto result = std::find(selected_cells.begin(), selected_cells.end(), cell_index);
+		bool not_in_guesses =
+			std::find_if(guesses.begin(), guesses.end(), [cell_index](guess g) { return g.index == cell_index; }) == guesses.end();
 
-		if (selected_cells.size() == 0) {
-			selected_cells.push_back(cell_index);
-			has_guess = false;
-		} else if (has_guess && result == selected_cells.end()) {
-			selected_cells.push_back(cell_index);
-			has_guess = false;
-		} else if (!has_guess && cell_index == selected_cells.back()) {
-			selected_cells.erase(selected_cells.end()-1);
-			has_guess = true;
+		if (not_in_guesses) {
+			if (has_guess) {
+				selected_cell = cell_index;
+				has_guess = false;
+			}  else if (cell_index == selected_cell) {
+				has_guess = true;
+			}
 		}
 	}
+}
+
+void game_board::draw_line(uint32_t cell_index) const
+{
+	Vector2 top_left = {cells[cell_index].x + 2, cells[cell_index].y + 2};
+	Vector2 bottom_right = {cells[cell_index].x + cell_w - 2, cells[cell_index].y + cell_h - 2};
+	DrawLineV(top_left, bottom_right, selected_color);
+}
+
+void game_board::draw_cross(uint32_t cell_index) const
+{
+	draw_line(cell_index);
+
+	Vector2 top_right = {cells[cell_index].x + 2, cells[cell_index].y + cell_h - 2};
+	Vector2 bottom_left = {cells[cell_index].x + cell_w - 2, cells[cell_index].y + 2};
+	DrawLineV(top_right, bottom_left, selected_color);
 }
 
 void game_board::draw() const
@@ -59,23 +74,35 @@ void game_board::draw() const
 		DrawRectangleLinesEx({cells[i].x, cells[i].y, cell_w, cell_h}, 2, highlighted_color);
 	}
 
-	for (const auto i : selected_cells) {
-		Vector2 top_left = {cells[i].x + 2, cells[i].y + 2};
-		Vector2 bottom_right = {cells[i].x + cell_w - 2, cells[i].y + cell_h - 2};
-		DrawLineV(top_left, bottom_right, selected_color);
+	for (const auto &guess : guesses) {
+		if (guess.good)
+			draw_cross(guess.index);
+		else
+			draw_line(guess.index);
+	}
 
-		Vector2 top_right = {cells[i].x + 2, cells[i].y + cell_h - 2};
-		Vector2 bottom_left = {cells[i].x + cell_w - 2, cells[i].y + 2};
-		DrawLineV(top_right, bottom_left, selected_color);
+	if (!has_guess) {
+		DrawRectangleLinesEx({cells[selected_cell].x, cells[selected_cell].y, cell_w, cell_h}, 2, selected_color);
 	}
 }
 
-void game_board::guess(uint32_t guess)
+bool game_board::add_guess(uint32_t guess_index)
 {
-	// check if good
-	// add to guesses
-	std::cout << "Opponents guessed: " << guess << std::endl;
+	guess g{guess_index, true}; // check and create apropriately
+	opponent_guesses.push_back(g);
 	has_guess = true;
+	return g.good;
+}
+
+uint32_t game_board::get_guess()
+{
+	guesses.push_back(guess{selected_cell, false});
+	return selected_cell;
+}
+
+void game_board::validate_guess(bool good)
+{
+	guesses.back().good = good;
 }
 
 uint32_t game_board::to_index(const Vector2 &v) const

@@ -39,7 +39,7 @@ private:
 	void wait_draw();
 
 	window_type current_window = window_type::MENU_INIT;
-	game_board board{{100, 40, 400, 400}, NUM_CELLS};
+	game_board board{{50, 40, 400, 400}, NUM_CELLS};
 	net_client client{
 	[this](){
 		current_window = window_type::BOARD;
@@ -47,8 +47,10 @@ private:
 	},
 	[this](uint32_t guess){
 		current_window = window_type::BOARD;
-		board.guess(guess);
-	}};
+		client.send_validation(board.add_guess(guess));
+	},
+	[this](bool good) { board.validate_guess(good); }
+	};
 
 	bool quit = false;
 	static constexpr int window_width = 600, window_height = 480;
