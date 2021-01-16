@@ -96,14 +96,26 @@ void main_window::board_init()
 
 void main_window::board_update()
 {
-	if (IsKeyPressed(KEY_ENTER)) {
+	auto key = GetKeyPressed();
+
+	switch (key)
+	{
+	case KEY_ENTER: {
 		if (!board.has_guess) {
 			client.send_guess(board.get_guess());
 			current_window = window_type::WAIT;
 		} else {
-			//warn about not guessing
+			// warn about not guessing
 			std::cout << "Guess befor ending your turn!" << std::endl;
 		}
+	} break;
+
+	case KEY_V: {
+		board.toggle_view();
+	} break;
+
+	default:
+		break;
 	}
 
 	// loop returns true on connection error
@@ -128,5 +140,8 @@ void main_window::wait_update()
 void main_window::wait_draw()
 {
 	const char *message = "Opponents turn";
-	DrawText(message, (window_width - MeasureText(message, 20)) / 2, window_height / 2 - 10, 20, RAYWHITE);
+	DrawText(message, (window_width - MeasureText(message, 20)) / 2, 10, 20, DARKGREEN);
+
+	board.set_view(view_type::opponent);
+	board.draw();
 }

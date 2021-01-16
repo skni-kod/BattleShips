@@ -39,7 +39,7 @@ private:
 	void wait_draw();
 
 	window_type current_window = window_type::MENU_INIT;
-	game_board board{{50, 40, 400, 400}, NUM_CELLS};
+	game_board board{{100, 40, 400, 400}, NUM_CELLS};
 	net_client client{
 	[this](){
 		current_window = window_type::BOARD;
