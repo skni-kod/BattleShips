@@ -6,14 +6,10 @@
 #include <string>
 #include <vector>
 
+#include "guess.hpp"
 #include "game_ships.hpp"
 
 enum class view_type { placement, player, opponent };
-
-struct guess {
-	uint32_t index;
-	bool good;
-};
 
 class game_board
 {
@@ -37,13 +33,11 @@ public:
 		return placement_done;
 	}
 
-	bool add_guess(uint32_t guess);
+	guess_type add_guess(uint32_t guess_index);
 
-	uint32_t get_guess();
+	uint32_t get_guess_index();
 
-	inline void validate_guess(bool good) { guesses.back().good = good; }
-
-	inline std::string &get_message() { return message; }
+	inline void validate_last_guess(guess_type type) { guesses.back().type = type; }
 
 	inline bool is_game_over() { return game_over; }
 
@@ -65,7 +59,6 @@ private:
 	view_type view = view_type::placement;
 	static inline bool placement_done = false;
 	bool game_over = false;
-	std::string message = "";
 
 	uint32_t mouse_index;
 	bool highlight = false;
@@ -76,5 +69,6 @@ private:
 
 	void draw_line(uint32_t cell_index) const;
 	void draw_cross(uint32_t cell_index) const;
+	void draw_circle(uint32_t cell_index) const;
 	uint32_t to_index(const Vector2 &v) const;
 };

@@ -5,12 +5,13 @@
 
 #include "message_type.hpp"
 #include "net.hpp"
+#include "../game/guess.hpp"
 
 class net_client : public net::client_interface<message_type>
 {
 public:
-	net_client(std::function<void()> on_start_func, std::function<void(uint32_t guess)> on_recieve_guess_func,
-		   std::function<void(bool good)> on_recieve_validation_func, std::function<void()> on_end_func)
+	net_client(std::function<void()> on_start_func, std::function<void(uint32_t guess_index)> on_recieve_guess_func,
+		   std::function<void(guess_type type)> on_recieve_validation_func, std::function<void()> on_end_func)
 	    : on_start(on_start_func), on_recieve_guess(on_recieve_guess_func), on_recieve_validation(on_recieve_validation_func), on_end(on_end_func){};
 
 	void start()
@@ -29,12 +30,12 @@ public:
 		send(msg);
 	}
 
-	void send_validation(bool good)
+	void send_validation(guess_type type)
 	{
 		net::message<message_type> msg;
 		msg.header.id = message_type::send_validation;
 
-		msg << good;
+		msg << type;
 		send(msg);
 	}
 
@@ -74,10 +75,10 @@ public:
 
 				case message_type::recv_validation: {
 					std::cout << "Recived Validation: ";
-					bool good;
-					msg >> good;
-					std::cout << "guess " << (good ? "good" : "bad") << std::endl;
-					on_recieve_validation(good);
+					guess_type type;
+					msg >> type;
+					std::cout << "guess " << (type == guess_type::hit || type == guess_type::hit_and_sunk ? "good" : "bad") << std::endl;
+					on_recieve_validation(type);
 				} break;
 
 				case message_type::end: {
@@ -98,7 +99,7 @@ public:
 
 private:
 	std::function<void()> on_start;
-	std::function<void(uint32_t guess)> on_recieve_guess;
-	std::function<void(bool guess)> on_recieve_validation;
+	std::function<void(uint32_t guess_index)> on_recieve_guess;
+	std::function<void(guess_type type)> on_recieve_validation;
 	std::function<void()> on_end;
 };

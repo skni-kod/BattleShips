@@ -101,6 +101,14 @@ void main_window::menu_update()
 void main_window::menu_draw()
 {
 	board.draw();
+
+	DrawText("Place ships", 515, 25, 20, GREEN);
+	const char *message =
+		"Mouse left:\n\tplace horizontally\n"
+		"Mouse right:\n\tplace vertically\n"
+		"Connect when done.\n";
+	DrawText(message, 515, 50, 20, DARKGREEN);
+
 	select_submarines.draw();
 	select_destroyers.draw();
 	select_cruisers.draw();
@@ -124,6 +132,9 @@ void main_window::wait_init()
 
 void main_window::wait_update()
 {
+	if (IsKeyPressed(KEY_V))
+		board.toggle_view();
+
 	// loop returns true on connection error
 	if (client.loop())
 		quit = true;
@@ -131,8 +142,18 @@ void main_window::wait_update()
 
 void main_window::wait_draw()
 {
-	const char *message = "Opponents turn";
-	DrawText(message, (window_width - MeasureText(message, 20)) / 2, 10, 20, DARKGREEN);
+	DrawText("Opponent's turn", 515, 25, 20, GREEN);
+
+	const char *message =
+		"wait for your turn\n"
+		"V:\n\tchange board view\n"
+		"Last hit status:\n\t%s\n"
+		"\n"
+		"Symbols:\n"
+		"/: miss\n"
+		"X: hit\n"
+		"O: hit and sunk";
+	DrawText(TextFormat(message, turn_message.c_str()), 515, 50, 20, DARKGREEN);
 
 	board.draw();
 }
@@ -152,7 +173,7 @@ void main_window::board_update()
 	{
 	case KEY_SPACE: {
 		if (!board.has_guess) {
-			client.send_guess(board.get_guess());
+			client.send_guess(board.get_guess_index());
 			current_window = window_type::WAIT_INIT;
 		}
 	} break;
@@ -177,9 +198,21 @@ void main_window::board_update()
 
 void main_window::board_draw()
 {
+	DrawText("Your turn", 515, 25, 20, GREEN);
+	
+	const char *message =
+		"Mouse left:\n\tselect a cell\n"
+		"V:\n\tchange board view\n"
+		"SPACE:\n\tend turn\n"
+		"Last hit status:\n\t%s\n"
+		"\n"
+		"Symbols:\n"
+		"/: miss\n"
+		"X: hit\n"
+		"O: hit and sunk";
+	DrawText(TextFormat(message, turn_message.c_str()), 515, 50, 20, DARKGREEN);
+
 	board.draw();
-	const char *message = board.get_message().c_str();
-	DrawText(message, (window_width - MeasureText(message, 20)) / 2, 10, 20, DARKGREEN);
 }
 
 

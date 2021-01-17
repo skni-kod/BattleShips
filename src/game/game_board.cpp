@@ -40,26 +40,26 @@ bool game_board::update_ships(bool vertical_placement)
 	return false;
 }
 
-bool game_board::add_guess(uint32_t guess_index)
+guess_type game_board::add_guess(uint32_t guess_index)
 {
-	guess g{guess_index, ships.was_hit(guess_index)};
-	opponent_guesses.push_back(g);
+	guess g{guess_index, guess_type::miss};
 
+	if (ships.was_hit(guess_index))
+		g.type = guess_type::hit;
+	
 	if (ships.was_sunk())
-		message = "Your ship was sunk!";
-	else if (g.good)
-		message = "Your ship was hit!";
-	else
-		message = "Opponent missed!";
+		g.type = guess_type::hit_and_sunk;
+
+	opponent_guesses.push_back(g);
 
 	if (ships.all_sunk()) game_over = true;
 		 
-	return g.good;
+	return g.type;
 }
 
-uint32_t game_board::get_guess()
+uint32_t game_board::get_guess_index()
 {
-	guesses.push_back(guess{selected_cell, false});
+	guesses.push_back(guess{selected_cell, guess_type::miss});
 	return selected_cell;
 }
 
@@ -106,7 +106,9 @@ void game_board::draw() const
 		}
 
 		for (const auto &guess : guesses) {
-			if (guess.good)
+			if (guess.type == guess_type::hit_and_sunk)
+				draw_circle(guess.index);
+			else if (guess.type == guess_type::hit)
 				draw_cross(guess.index);
 			else
 				draw_line(guess.index);
@@ -120,7 +122,9 @@ void game_board::draw() const
 		ships.draw();
 
 		for (const auto &guess : opponent_guesses) {
-			if (guess.good)
+			if (guess.type == guess_type::hit_and_sunk)
+				draw_circle(guess.index);
+			else if (guess.type == guess_type::hit)
 				draw_cross(guess.index);
 			else
 				draw_line(guess.index);
@@ -138,16 +142,23 @@ uint32_t game_board::to_index(const Vector2 &v) const
 
 void game_board::draw_line(uint32_t cell_index) const
 {
-	Vector2 top_left = {cells[cell_index].x + 2, cells[cell_index].y + 2};
-	Vector2 bottom_right = {cells[cell_index].x + cell_w - 2, cells[cell_index].y + cell_h - 2};
-	DrawLineV(top_left, bottom_right, selected_color);
+	Vector2 top_left = {cells[cell_index].x + 6, cells[cell_index].y + 6};
+	Vector2 bottom_right = {cells[cell_index].x + cell_w - 6, cells[cell_index].y + cell_h - 6};
+	DrawLineEx(top_left, bottom_right, 2, selected_color);
 }
 
 void game_board::draw_cross(uint32_t cell_index) const
 {
 	draw_line(cell_index);
 
-	Vector2 top_right = {cells[cell_index].x + 2, cells[cell_index].y + cell_h - 2};
-	Vector2 bottom_left = {cells[cell_index].x + cell_w - 2, cells[cell_index].y + 2};
-	DrawLineV(top_right, bottom_left, selected_color);
+	Vector2 top_right = {cells[cell_index].x + 6, cells[cell_index].y + cell_h - 6};
+	Vector2 bottom_left = {cells[cell_index].x + cell_w - 6, cells[cell_index].y + 6};
+	DrawLineEx(top_right, bottom_left, 2, selected_color);
+}
+
+void game_board::draw_circle(uint32_t cell_index) const
+{
+	float radius = cell_w / 2 - 6;
+	Vector2 center = {cells[cell_index].x + 6 + radius, cells[cell_index].y + 6 + radius};
+	DrawCircleV(center, radius, selected_color);
 }

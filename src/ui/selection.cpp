@@ -40,9 +40,9 @@ void selection::update()
 {
 	sel_btn.update();
 	if (main_window::selected_ship_type == sel_type)
-		outline = true;
+		highlight = true;
 	else
-		outline = false; 
+		highlight = false; 
 
 
 	btn1.update();
@@ -51,8 +51,8 @@ void selection::update()
 
 void selection::draw()
 {
-	if (outline)
-		DrawRectangleLinesEx(bounds, 1, DARKGREEN);
+	if (highlight)
+		DrawRectangleLinesEx({bounds.x - 5, bounds.y - 5, bounds.width, bounds.height + 10}, 1, highlight_color);
 
 	DrawText(TextFormat(label_format.c_str(), counter), static_cast<int>(bounds.x), static_cast<int>(bounds.y), font_size, label_color);
 	

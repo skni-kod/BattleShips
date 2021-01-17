@@ -48,13 +48,14 @@ private:
 	void game_over();
 
 	window_type current_window = window_type::MENU_INIT;
-	game_board board{{50, 40, 400, 400}, 10};
+	game_board board{{50, 25, 400, 400}, 10};
 	net_client client{
 	[this](){
 		current_window = window_type::BOARD_INIT;
 	},
-	[this](uint32_t guess){
-		client.send_validation(board.add_guess(guess));
+	[this](uint32_t guess_index){
+		client.send_validation(board.add_guess(guess_index));
+
 		if (board.is_game_over()) {
 			client.end();
 			current_window = window_type::GAME_OVER;
@@ -62,7 +63,23 @@ private:
 			current_window = window_type::BOARD_INIT;
 		}
 	},
-	[this](bool good) { board.validate_guess(good); },
+	[this](guess_type type) {
+		board.validate_last_guess(type);
+
+		switch (type) {
+		case guess_type::miss:
+			turn_message = "miss";
+			break;
+
+		case guess_type::hit:
+			turn_message = "hit";
+			break;
+
+		case guess_type::hit_and_sunk:
+			turn_message = "hit and sunk";
+			break;
+		}
+	},
 	[this]() {
 		won = true;
 		current_window = window_type::GAME_OVER;
@@ -82,11 +99,13 @@ private:
 	    {ship_type::carrier, 1}
 	};
 
-	selection select_submarines{{550, 120}, "Submarines: %d ", ship_type::submarine};
-	selection select_destroyers{{550, 150}, "Destroyers: %d ", ship_type::destroyer};
-	selection select_cruisers{{550, 180}, "Cruisers: %d   ", ship_type::cruiser};
-	selection select_battleships{{550, 210}, "Battleships: %d", ship_type::battleship};
-	selection select_carriers{{550, 240}, "Carriers: %d   ", ship_type::carrier};
+	selection select_submarines{{515, 210}, "Submarines: %d ", ship_type::submarine};
+	selection select_destroyers{{515, 240}, "Destroyers: %d ", ship_type::destroyer};
+	selection select_cruisers{{515, 270}, "Cruisers: %d   ", ship_type::cruiser};
+	selection select_battleships{{515, 300}, "Battleships: %d", ship_type::battleship};
+	selection select_carriers{{515, 330}, "Carriers: %d   ", ship_type::carrier};
 
-	button connect_btn{{550, 330, 200, 50}, "CONNECT"};
+	button connect_btn{{515, 375, 220, 50}, "CONNECT"};
+
+	std::string turn_message;
 };

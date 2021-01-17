@@ -9,6 +9,7 @@ class selection
 public:
 	std::string label_format;
 	Color label_color = DARKGREEN;
+	Color highlight_color = GREEN;
 
 	selection(Vector2 vec, std::string selection_label_format, ship_type type);
 
@@ -19,7 +20,7 @@ public:
 private:
 	Rectangle bounds;
 	const int font_size = 20;
-	bool outline = false;
+	bool highlight = false;
 
 	ship_type sel_type;
 	button sel_btn;
