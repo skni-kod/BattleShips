@@ -81,6 +81,12 @@ void main_window::menu_init()
 
 void main_window::menu_update()
 {
+	board.update_highlight();
+	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+		board.update_ships(false);
+	if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
+		board.update_ships(true);
+
 	select_submarines.update();
 	select_destroyers.update();
 	select_cruisers.update();
@@ -91,6 +97,7 @@ void main_window::menu_update()
 
 void main_window::menu_draw()
 {
+	board.draw();
 	select_submarines.draw();
 	select_destroyers.draw();
 	select_cruisers.draw();

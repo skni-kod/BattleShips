@@ -31,20 +31,14 @@ private:
 class game_ships
 {
 public:
-	game_ships();
-
-	void place(ship_type type);
-
 	bool check(uint32_t index);
 
-	void update();
+	bool update(uint32_t index, bool vertical_placement);
 
 	void draw() const;
-
-	void draw_highlight() const;
 
 private:
 	std::vector<ship> ships{};
 
-	bool verify();
+	bool valid_layout();
 };

@@ -37,6 +37,14 @@ void game_board::toggle_view()
 		view = view_type::player;
 }
 
+bool game_board::update_ships(bool vertical_placement)
+{
+	if (highlight)
+		return ships.update(mouse_index, vertical_placement);
+
+	return false;
+}
+
 bool game_board::add_guess(uint32_t guess_index)
 {
 	guess g{guess_index, ships.check(guess_index)}; // check and create apropriately
@@ -54,7 +62,8 @@ void game_board::validate_guess(bool good) { guesses.back().good = good; }
 
 void game_board::update_highlight()
 {
-	mouse_pos = GetMousePosition();
+	auto mouse_pos = GetMousePosition();
+	mouse_index = to_index(mouse_pos);
 	if (CheckCollisionPointRec(mouse_pos, bounds))
 		highlight = true;
 	else
@@ -63,16 +72,16 @@ void game_board::update_highlight()
 
 void game_board::update_selected()
 {
-	if (view == view_type::player && CheckCollisionPointRec(mouse_pos, bounds)) {
-		const auto cell_index = to_index(mouse_pos);
-		bool not_in_guesses =
-			std::find_if(guesses.begin(), guesses.end(), [cell_index](guess g) { return g.index == cell_index; }) == guesses.end();
+	if (view == view_type::player && highlight) {
+		bool not_in_guesses = std::find_if(guesses.begin(), guesses.end(), [this](guess g) {
+						    return g.index == mouse_index;
+					    }) == guesses.end();
 
 		if (not_in_guesses) {
 			if (has_guess) {
-				selected_cell = cell_index;
+				selected_cell = mouse_index;
 				has_guess = false;
-			}  else if (cell_index == selected_cell) {
+			} else if (mouse_index == selected_cell) {
 				has_guess = true;
 			}
 		}
@@ -86,10 +95,11 @@ void game_board::draw() const
 		DrawRectangleLinesEx({cell.x, cell.y, cell_w, cell_h}, 2, normal_color);
 	}
 
-	if (view == view_type::player) {
+	if (view == view_type::placement) {
+		ships.draw();
+	} else if (view == view_type::player) {
 		if (highlight) {
-			const auto i = to_index(mouse_pos);
-			DrawRectangleLinesEx({cells[i].x, cells[i].y, cell_w, cell_h}, 2, highlighted_color);
+			DrawRectangleLinesEx({cells[mouse_index].x, cells[mouse_index].y, cell_w, cell_h}, 2, highlighted_color);
 		}
 
 		for (const auto &guess : guesses) {

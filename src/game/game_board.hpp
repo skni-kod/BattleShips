@@ -17,6 +17,7 @@ struct guess {
 class game_board
 {
 	friend class ship;
+	friend class game_ships;
 
 public:
 	bool has_guess = false;
@@ -26,6 +27,8 @@ public:
 	void set_view(view_type desired_view);
 
 	void toggle_view();
+
+	bool update_ships(bool vertical_placement);
 
 	bool add_guess(uint32_t guess);
 
@@ -50,7 +53,7 @@ private:
 	game_ships ships;
 	view_type view = view_type::placement;
 
-	Vector2 mouse_pos;
+	uint32_t mouse_index;
 	bool highlight = false;
 
 	Color normal_color = DARKGREEN;
