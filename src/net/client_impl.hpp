@@ -5,7 +5,7 @@
 
 #include "message_type.hpp"
 #include "net.hpp"
-#include "../game/guess.hpp"
+#include "../game/guess_type.hpp"
 
 class net_client : public net::client_interface<message_type>
 {
