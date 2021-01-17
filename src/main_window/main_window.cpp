@@ -74,7 +74,10 @@ void main_window::loop()
 
 void main_window::menu_init()
 {
-	connect_btn.action = [&current_window = current_window]() { current_window = window_type::GAME_START; };
+	connect_btn.action = [this]() {
+		if (board.is_placement_done())
+			current_window = window_type::GAME_START;
+	};
 
 	current_window = window_type::MENU;
 }

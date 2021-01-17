@@ -30,6 +30,8 @@ public:
 
 	bool update_ships(bool vertical_placement);
 
+	inline bool is_placement_done() { return placement_done; }
+
 	bool add_guess(uint32_t guess);
 
 	uint32_t get_guess();
@@ -52,6 +54,7 @@ private:
 	uint32_t selected_cell = 0;
 	game_ships ships;
 	view_type view = view_type::placement;
+	static inline bool placement_done = false;
 
 	uint32_t mouse_index;
 	bool highlight = false;
