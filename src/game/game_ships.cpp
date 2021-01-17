@@ -6,7 +6,7 @@ ship::ship(ship_type type, uint32_t start_index, bool is_vertical) : vertical(is
 {
 	if (vertical) {
 		for (uint32_t i = 0; i < length(); i++)
-			indexes[start_index + game_board::num_cells*i] = false;
+			indexes[start_index + i*game_board::num_cells] = false;
 	} else {
 		for (uint32_t i = 0; i < length(); i++)
 			indexes[start_index + i] = false;
@@ -20,13 +20,12 @@ void ship::draw() const
 			       {game_board::cell_w - 10, game_board::cell_h - 10}, LIME);
 }
 
-bool game_ships::check(uint32_t index)
+bool game_ships::check(uint32_t index, bool ignore_last)
 {
-	for (auto &s : ships) {
-		if (s.indexes.contains(index))
+	for (auto it = ships.begin(); it != ships.end() - (ignore_last ? 1 : 0); it++) {
+		if (it->indexes.contains(index))
 			return true;
 	}
-
 	return false;
 }
 
@@ -40,7 +39,6 @@ bool game_ships::was_hit(uint32_t index)
 		}
 			
 	}
-
 	return false;
 }
 
@@ -103,56 +101,75 @@ bool game_ships::valid_layout()
 	bool left = ship_indexes.front() % 10 == 0;
 	bool right = ship_indexes.back() + 1 % 10 == 0;
 
+
+	// check if overlapping
+	for (auto i : ship_indexes)
+		if (check(i, true))
+			return false;
+
 	if (s.vertical) {
+		// check if last index is in bounds
 		if (ship_indexes.back() > game_board::num_cells * game_board::num_cells)
 			return false;
 
-		if (!top && check(ship_indexes.front() - y_offset))
+		// corner checks
+		if (!top && !left && check(ship_indexes.front() - x_offset - y_offset))
+			return false;
+		if (!top && !right && check(ship_indexes.front() + x_offset - y_offset))
+			return false;
+		if (!bottom && !right && check(ship_indexes.back() + x_offset + y_offset))
+			return false;
+		if (!bottom && !left && check(ship_indexes.back() - x_offset + y_offset))
 			return false;
 
+		// vertical checks
+		if (!top && check(ship_indexes.front() - y_offset))
+			return false;
 		if (!bottom && check(ship_indexes.back() + y_offset))
 			return false;
 
+		// horizontal checks
 		if (!left)
 			for (auto i : ship_indexes)
 				if (check(i - x_offset))
 					return false;
-
 		if (!right)
 			for (auto i : ship_indexes)
 				if (check(i + x_offset))
 					return false;
 	} else {
+		// check if last index is in the same row
 		int len =
 		    (ship_indexes.back() % game_board::num_cells) - (ship_indexes.front() % game_board::num_cells);
 		if (len < 0 || len > ship_indexes.size())
 			return false;
 
+		// corner checks
+		if (!top && !left && check(ship_indexes.front() - x_offset - y_offset))
+			return false;
+		if (!top && !right && check(ship_indexes.back() + x_offset - y_offset))
+			return false;
+		if (!bottom && !right && check(ship_indexes.back() + x_offset + y_offset))
+			return false;
+		if (!bottom && !left && check(ship_indexes.front() - x_offset + y_offset))
+			return false;
+
+		// vertical checks
 		if (!top)
 			for (auto i : ship_indexes)
 				if (check(i - y_offset))
 					return false;
-
 		if (!bottom)
 			for (auto i : ship_indexes)
 				if (check(i + y_offset))
 					return false;
 
+		// horizontal checks
 		if (!left && check(ship_indexes.front() - x_offset))
 			return false;
-
 		if (!right && check(ship_indexes.back() + x_offset))
 			return false;
 	}
-
-	if (!top && !left && check(ship_indexes.front() - x_offset - y_offset))
-		return false;
-	if (!top && !right && check(ship_indexes.front() + x_offset - y_offset))
-		return false;
-	if (!bottom && !right && check(ship_indexes.front() + x_offset + y_offset))
-		return false;
-	if (!bottom && !left && check(ship_indexes.front() - x_offset + y_offset))
-		return false;
 
 	game_board::placement_done = true;
 	for (auto &[type, limit] : main_window::ship_types_count)

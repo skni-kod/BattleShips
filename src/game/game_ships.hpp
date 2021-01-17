@@ -30,7 +30,7 @@ private:
 class game_ships
 {
 public:
-	bool check(uint32_t index);
+	bool check(uint32_t index, bool ignore_last = false);
 
 	bool was_hit(uint32_t index);
 
