@@ -2,8 +2,10 @@
 
 #include <raylib.h>
 #include <string>
+#include <map>
 
 #include "../game/game_board.hpp"
+#include "../game/game_ships.hpp"
 #include "../net/client_impl.hpp"
 #include "../ui/button.hpp"
 #include "../ui/selection.hpp"
@@ -12,6 +14,9 @@ enum class window_type { MENU_INIT, MENU, GAME_START, BOARD_INIT, BOARD, WAIT_IN
 
 class main_window
 {
+	friend class selection;
+	friend class game_ships;
+
 public:
 	main_window();
 
@@ -60,15 +65,18 @@ private:
 	std::string hostname = "127.0.0.1";
 	uint16_t port = 60000;
 
-	static inline uint8_t submarines_count = 2;
-	selection select_submarines{ {550, 120}, "Submarines: %d ", submarines_count};
-	static inline uint8_t destroyer_count = 2;
-	selection select_destroyers{ {550, 150}, "Destroyers: %d ", destroyer_count};
-	static inline uint8_t cruiser_count = 1;
-	selection select_cruisers{   {550, 180}, "Cruisers: %d   ", cruiser_count};
-	static inline uint8_t battleship_count = 1;
-	selection select_battleships{{550, 210}, "Battleships: %d", battleship_count};
-	static inline uint8_t carrier_count = 1;
-	selection select_carriers{   {550, 240}, "Carriers: %d   ", carrier_count};
+	static inline ship_type selected_ship_type = ship_type::submarine;
+
+	static inline std::map<ship_type, uint8_t> ship_types_count = {
+		{ship_type::submarine, 2}, {ship_type::destroyer, 2}, {ship_type::cruiser, 1}, {ship_type::battleship, 1},
+	    {ship_type::carrier, 1}
+	};
+
+	selection select_submarines{{550, 120}, "Submarines: %d ", ship_type::submarine};
+	selection select_destroyers{{550, 150}, "Destroyers: %d ", ship_type::destroyer};
+	selection select_cruisers{{550, 180}, "Cruisers: %d   ", ship_type::cruiser};
+	selection select_battleships{{550, 210}, "Battleships: %d", ship_type::battleship};
+	selection select_carriers{{550, 240}, "Carriers: %d   ", ship_type::carrier};
+
 	button connect_btn{{550, 330, 200, 50}, "CONNECT"};
 };
