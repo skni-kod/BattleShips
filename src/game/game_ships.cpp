@@ -73,6 +73,9 @@ bool game_ships::all_sunk()
 
 bool game_ships::valid_layout()
 {
+	if (ships.size() == 0)
+		return false;
+
 	auto type_count = [this](ship_type type) {
 		uint32_t count = 0;
 		for (auto &s : ships) {
@@ -103,6 +106,7 @@ bool game_ships::valid_layout()
 
 		if (!top && check(ship_indexes.front() - y_offset))
 			return false;
+
 		if (!bottom && check(ship_indexes.back() + y_offset))
 			return false;
 
@@ -110,6 +114,7 @@ bool game_ships::valid_layout()
 			for (auto i : ship_indexes)
 				if (check(i - x_offset))
 					return false;
+
 		if (!right)
 			for (auto i : ship_indexes)
 				if (check(i + x_offset))
@@ -124,6 +129,7 @@ bool game_ships::valid_layout()
 			for (auto i : ship_indexes)
 				if (check(i - y_offset))
 					return false;
+
 		if (!bottom)
 			for (auto i : ship_indexes)
 				if (check(i + y_offset))
@@ -131,6 +137,7 @@ bool game_ships::valid_layout()
 
 		if (!left && check(ship_indexes.front() - x_offset))
 			return false;
+
 		if (!right && check(ship_indexes.back() + x_offset))
 			return false;
 	}
@@ -144,9 +151,10 @@ bool game_ships::valid_layout()
 	if (!bottom && !left && check(ship_indexes.front() - x_offset + y_offset))
 		return false;
 
+	game_board::placement_done = true;
 	for (auto &[type, limit] : main_window::ship_types_count)
-		if (type_count(type) == limit)
-			game_board::placement_done = true;
+		if (type_count(type) != limit)
+			game_board::placement_done = false;
 
 	return true;
 }
