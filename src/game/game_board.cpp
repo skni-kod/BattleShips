@@ -42,24 +42,24 @@ bool game_board::update_ships(bool vertical_placement)
 
 guess_type game_board::add_guess(uint32_t guess_index)
 {
-	guess g{guess_index, guess_type::miss};
-
-	if (ships.was_hit(guess_index))
-		g.type = guess_type::hit;
+	if (ships.was_hit(guess_index)) {
+		opponent_guesses[guess_index] = guess_type::hit;
+	}
+		
 	
-	if (ships.was_sunk())
-		g.type = guess_type::hit_and_sunk;
-
-	opponent_guesses.push_back(g);
+	if (auto sunk_indexes = ships.get_sunk_indexes(); sunk_indexes.size() != 0) {
+		for (auto i : sunk_indexes)
+			opponent_guesses[i] = guess_type::hit_and_sunk;
+	}	
 
 	if (ships.all_sunk()) game_over = true;
 		 
-	return g.type;
+	return opponent_guesses[guess_index];
 }
 
 uint32_t game_board::get_guess_index()
 {
-	guesses.push_back(guess{selected_cell, guess_type::miss});
+	guesses[selected_cell] = guess_type::miss;
 	return selected_cell;
 }
 
@@ -76,11 +76,7 @@ void game_board::update_highlight()
 void game_board::update_selected()
 {
 	if (view == view_type::player && highlight) {
-		bool not_in_guesses = std::find_if(guesses.begin(), guesses.end(), [this](guess g) {
-						    return g.index == mouse_index;
-					    }) == guesses.end();
-
-		if (not_in_guesses) {
+		if (!guesses.contains(mouse_index)) {
 			if (has_guess) {
 				selected_cell = mouse_index;
 				has_guess = false;
@@ -105,13 +101,13 @@ void game_board::draw() const
 			DrawRectangleLinesEx({cells[mouse_index].x, cells[mouse_index].y, cell_w, cell_h}, 2, highlighted_color);
 		}
 
-		for (const auto &guess : guesses) {
-			if (guess.type == guess_type::hit_and_sunk)
-				draw_circle(guess.index);
-			else if (guess.type == guess_type::hit)
-				draw_cross(guess.index);
+		for (const auto &[index, type] : guesses) {
+			if (type == guess_type::hit_and_sunk)
+				draw_circle(index);
+			else if (type == guess_type::hit)
+				draw_cross(index);
 			else
-				draw_line(guess.index);
+				draw_line(index);
 		}
 
 		if (!has_guess) {
@@ -121,13 +117,13 @@ void game_board::draw() const
 	} else if (view == view_type::opponent) {
 		ships.draw();
 
-		for (const auto &guess : opponent_guesses) {
-			if (guess.type == guess_type::hit_and_sunk)
-				draw_circle(guess.index);
-			else if (guess.type == guess_type::hit)
-				draw_cross(guess.index);
+		for (const auto &[index, type] : opponent_guesses) {
+			if (type == guess_type::hit_and_sunk)
+				draw_circle(index);
+			else if (type == guess_type::hit)
+				draw_cross(index);
 			else
-				draw_line(guess.index);
+				draw_line(index);
 		}
 	}
 }

@@ -34,8 +34,8 @@ public:
 
 	bool was_hit(uint32_t index);
 
-	bool was_sunk();
-
+	std::vector<uint32_t> get_sunk_indexes();
+	
 	bool all_sunk();
 
 	bool valid_layout();

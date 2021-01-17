@@ -44,8 +44,9 @@ bool game_ships::was_hit(uint32_t index)
 	return false;
 }
 
-bool game_ships::was_sunk()
+std::vector<uint32_t> game_ships::get_sunk_indexes()
 {
+	std::vector<uint32_t> sunk_indexes;
 	for (auto &s : ships) {
 		if (s.sunk)
 			continue;
@@ -57,10 +58,12 @@ bool game_ships::was_sunk()
 
 		if (count == s.indexes.size()) {
 			s.sunk = true;
-			return s.sunk;
+			for (auto [i, _] : s.indexes)
+				sunk_indexes.push_back(i);
+			break;
 		}
 	}
-	return false;
+	return sunk_indexes;
 }
 
 bool game_ships::all_sunk()

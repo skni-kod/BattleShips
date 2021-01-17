@@ -2,11 +2,11 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <unordered_map>
 #include <raylib.h>
-#include <string>
 #include <vector>
 
-#include "guess.hpp"
+#include "guess_type.hpp"
 #include "game_ships.hpp"
 
 enum class view_type { placement, player, opponent };
@@ -25,6 +25,14 @@ public:
 
 	void toggle_view();
 
+	inline const char *get_view_cstr() const
+	{
+		if (view == view_type::opponent)
+			return "opponent's";
+		else
+			return "player's";
+	}
+
 	bool update_ships(bool vertical_placement);
 
 	inline bool is_placement_done()
@@ -37,7 +45,7 @@ public:
 
 	uint32_t get_guess_index();
 
-	inline void validate_last_guess(guess_type type) { guesses.back().type = type; }
+	inline void validate_last_guess(guess_type type) { guesses[selected_cell] = type; }
 
 	inline bool is_game_over() { return game_over; }
 
@@ -52,8 +60,8 @@ private:
 	static uint32_t num_cells;
 	static float cell_w, cell_h;
 	inline static std::vector<Vector2> cells{};
-	std::vector<guess> guesses;
-	std::vector<guess> opponent_guesses;
+	std::unordered_map<uint32_t, guess_type> guesses;
+	std::unordered_map<uint32_t, guess_type> opponent_guesses;
 	uint32_t selected_cell = 0;
 	game_ships ships;
 	view_type view = view_type::placement;
