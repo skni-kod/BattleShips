@@ -18,14 +18,13 @@ public:
 
 	inline uint32_t length() { return static_cast<uint32_t>(type); };
 
-	bool check(uint32_t index);
-
 	void draw() const;
 
 private:
 	ship_type type;
 	std::map<uint32_t, bool> indexes;
 	bool vertical;
+	bool sunk = false;
 };
 
 class game_ships
@@ -33,12 +32,18 @@ class game_ships
 public:
 	bool check(uint32_t index);
 
+	bool was_hit(uint32_t index);
+
+	bool was_sunk();
+
+	bool all_sunk();
+
+	bool valid_layout();
+
 	bool update(uint32_t index, bool vertical_placement);
 
 	void draw() const;
 
 private:
 	std::vector<ship> ships{};
-
-	bool valid_layout();
 };

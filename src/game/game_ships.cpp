@@ -13,15 +13,6 @@ ship::ship(ship_type type, uint32_t start_index, bool is_vertical) : vertical(is
 	}
 }
 
-bool ship::check(uint32_t index)
-{
-	if (indexes.contains(index)) {
-		indexes[index] = true;
-		return true;
-	}
-	return false;
-}
-
 void ship::draw() const
 {
 	for (auto [i, _] : indexes)
@@ -32,34 +23,52 @@ void ship::draw() const
 bool game_ships::check(uint32_t index)
 {
 	for (auto &s : ships) {
-		if (s.check(index))
+		if (s.indexes.contains(index))
 			return true;
 	}
 
 	return false;
 }
 
-bool game_ships::update(uint32_t index, bool vertical_placement)
+
+bool game_ships::was_hit(uint32_t index)
 {
-	auto ship_to_remove = std::find_if(ships.begin(), ships.end(), [index](ship s) { return s.indexes.contains(index); });
-	if (ship_to_remove != ships.end()) {
-		ships.erase(ship_to_remove);
-		game_board::placement_done = false;
-	} else {
-		ships.emplace_back(main_window::selected_ship_type, index, vertical_placement);
-		if (!valid_layout()) {
-			ships.erase(ships.end() - 1);
-			return false;
+	for (auto &s : ships) {
+		if (s.indexes.contains(index)) {
+			s.indexes[index] = true;
+			return s.indexes[index];
 		}
+			
 	}
-	return true;
+
+	return false;
 }
 
-void game_ships::draw() const
+bool game_ships::was_sunk()
 {
-	for (const auto &s : ships) {
-		s.draw();
+	for (auto &s : ships) {
+		if (s.sunk)
+			continue;
+
+		uint32_t count = 0;
+		for (auto [_, hit] : s.indexes)
+			if (hit)
+				count++;
+
+		if (count == s.indexes.size()) {
+			s.sunk = true;
+			return s.sunk;
+		}
 	}
+	return false;
+}
+
+bool game_ships::all_sunk()
+{
+	for (auto &s : ships)
+		if (!s.sunk)
+			return false;
+	return true;
 }
 
 bool game_ships::valid_layout()
@@ -87,7 +96,6 @@ bool game_ships::valid_layout()
 	bool bottom = ship_indexes.back() >= y_offset * y_offset - y_offset;
 	bool left = ship_indexes.front() % 10 == 0;
 	bool right = ship_indexes.back() + 1 % 10 == 0;
-
 
 	if (s.vertical) {
 		if (ship_indexes.back() > game_board::num_cells * game_board::num_cells)
@@ -121,7 +129,6 @@ bool game_ships::valid_layout()
 				if (check(i + y_offset))
 					return false;
 
-
 		if (!left && check(ship_indexes.front() - x_offset))
 			return false;
 		if (!right && check(ship_indexes.back() + x_offset))
@@ -138,8 +145,32 @@ bool game_ships::valid_layout()
 		return false;
 
 	for (auto &[type, limit] : main_window::ship_types_count)
-		if (type_count(type) < limit)
+		if (type_count(type) == limit)
 			game_board::placement_done = true;
 
 	return true;
+}
+
+bool game_ships::update(uint32_t index, bool vertical_placement)
+{
+	auto ship_to_remove =
+	    std::find_if(ships.begin(), ships.end(), [index](ship s) { return s.indexes.contains(index); });
+	if (ship_to_remove != ships.end()) {
+		ships.erase(ship_to_remove);
+		game_board::placement_done = false;
+	} else {
+		ships.emplace_back(main_window::selected_ship_type, index, vertical_placement);
+		if (!valid_layout()) {
+			ships.erase(ships.end() - 1);
+			return false;
+		}
+	}
+	return true;
+}
+
+void game_ships::draw() const
+{
+	for (const auto &s : ships) {
+		s.draw();
+	}
 }

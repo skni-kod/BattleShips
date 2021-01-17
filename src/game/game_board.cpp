@@ -24,11 +24,6 @@ game_board::game_board(Rectangle rect, uint32_t cells_per_slice)
 	}
 }
 
-void game_board::set_view(view_type desired_view)
-{
-	view = desired_view;
-}
-
 void game_board::toggle_view()
 {
 	if (view == view_type::player)
@@ -47,8 +42,18 @@ bool game_board::update_ships(bool vertical_placement)
 
 bool game_board::add_guess(uint32_t guess_index)
 {
-	guess g{guess_index, ships.check(guess_index)}; // check and create apropriately
+	guess g{guess_index, ships.was_hit(guess_index)};
 	opponent_guesses.push_back(g);
+
+	if (ships.was_sunk())
+		message = "Your ship was sunk!";
+	else if (g.good)
+		message = "Your ship was hit!";
+	else
+		message = "Opponent missed!";
+
+	if (ships.all_sunk()) game_over = true;
+		 
 	return g.good;
 }
 
@@ -57,8 +62,6 @@ uint32_t game_board::get_guess()
 	guesses.push_back(guess{selected_cell, false});
 	return selected_cell;
 }
-
-void game_board::validate_guess(bool good) { guesses.back().good = good; }
 
 void game_board::update_highlight()
 {

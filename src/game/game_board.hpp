@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <raylib.h>
+#include <string>
 #include <vector>
 
 #include "game_ships.hpp"
@@ -24,19 +25,27 @@ public:
 
 	game_board(Rectangle rect, uint32_t cells_per_slice);
 
-	void set_view(view_type desired_view);
+	void set_view(view_type desired_view) { view = desired_view; }
 
 	void toggle_view();
 
 	bool update_ships(bool vertical_placement);
 
-	inline bool is_placement_done() { return placement_done; }
+	inline bool is_placement_done()
+	{
+		ships.valid_layout();
+		return placement_done;
+	}
 
 	bool add_guess(uint32_t guess);
 
 	uint32_t get_guess();
 
-	void validate_guess(bool good);
+	inline void validate_guess(bool good) { guesses.back().good = good; }
+
+	inline std::string &get_message() { return message; }
+
+	inline bool is_game_over() { return game_over; }
 
 	void update_highlight();
 
@@ -55,6 +64,8 @@ private:
 	game_ships ships;
 	view_type view = view_type::placement;
 	static inline bool placement_done = false;
+	bool game_over = false;
+	std::string message = "";
 
 	uint32_t mouse_index;
 	bool highlight = false;
