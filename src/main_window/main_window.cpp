@@ -142,18 +142,18 @@ void main_window::wait_update()
 
 void main_window::wait_draw()
 {
-	DrawText("Opponent's turn", 515, 25, 20, GREEN);
+	DrawText("Opponent turn", 515, 25, 20, GREEN);
 
 	const char *message =
 		"wait for your turn\n"
-		"V:\n\tchange board view\n"
+		"V: (change board view)\n\t%s guesses\n"
 		"Last hit status:\n\t%s\n"
 		"\n"
 		"Symbols:\n"
-		"/: miss\n"
-		"X: hit\n"
-		"O: hit and sunk";
-	DrawText(TextFormat(message, turn_message.c_str()), 515, 50, 20, DARKGREEN);
+		"slash: miss\n"
+		"cross: hit\n"
+		"circle: hit and sunk";
+	DrawText(TextFormat(message, board.get_view_cstr(), turn_message.c_str()), 515, 50, 20, DARKGREEN);
 
 	board.draw();
 }
@@ -201,16 +201,16 @@ void main_window::board_draw()
 	DrawText("Your turn", 515, 25, 20, GREEN);
 	
 	const char *message =
-		"Mouse left:\n\tselect a cell\n"
-		"V:\n\tchange board view\n"
-		"SPACE:\n\tend turn\n"
+		"Mouse left:\n\t(select a cell)\n"
+		"V: (change board view)\n\t%s guesses\n"
+		"SPACE:\n\t(end turn)\n"
 		"Last hit status:\n\t%s\n"
 		"\n"
 		"Symbols:\n"
-		"/: miss\n"
-		"X: hit\n"
-		"O: hit and sunk";
-	DrawText(TextFormat(message, turn_message.c_str()), 515, 50, 20, DARKGREEN);
+		"slash: miss\n"
+		"cross: hit\n"
+		"circle: hit and sunk";
+	DrawText(TextFormat(message, board.get_view_cstr(), turn_message.c_str()), 515, 50, 20, DARKGREEN);
 
 	board.draw();
 }
