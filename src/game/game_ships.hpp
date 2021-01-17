@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <raylib.h>
 #include <vector>
@@ -17,11 +18,13 @@ public:
 
 	inline uint32_t length() { return static_cast<uint32_t>(type); };
 
+	bool check(uint32_t index);
+
 	void draw() const;
 
 private:
 	ship_type type;
-	std::vector<uint32_t> indexes;
+	std::map<uint32_t, bool> indexes;
 	bool vertical;
 };
 
@@ -37,6 +40,8 @@ public:
 	void update();
 
 	void draw() const;
+
+	void draw_highlight() const;
 
 private:
 	std::vector<ship> ships{};

@@ -41,13 +41,12 @@ bool game_board::add_guess(uint32_t guess_index)
 {
 	guess g{guess_index, ships.check(guess_index)}; // check and create apropriately
 	opponent_guesses.push_back(g);
-	has_guess = true;
 	return g.good;
 }
 
 uint32_t game_board::get_guess()
 {
-	guesses.push_back(guess{selected_cell, true});
+	guesses.push_back(guess{selected_cell, false});
 	return selected_cell;
 }
 

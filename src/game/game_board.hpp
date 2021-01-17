@@ -7,14 +7,12 @@
 
 #include "game_ships.hpp"
 
-enum class view_type { player, opponent };
+enum class view_type { placement, player, opponent };
 
 struct guess {
 	uint32_t index;
 	bool good;
 };
-
-class ship;
 
 class game_board
 {
@@ -46,11 +44,11 @@ private:
 	static uint8_t num_cells;
 	static float cell_w, cell_h;
 	inline static std::vector<Vector2> cells{};
-	std::vector<guess> guesses{};
-	std::vector<guess> opponent_guesses{};
-	uint32_t selected_cell;
+	std::vector<guess> guesses;
+	std::vector<guess> opponent_guesses;
+	uint32_t selected_cell = 0;
 	game_ships ships;
-	view_type view = view_type::player;
+	view_type view = view_type::placement;
 
 	Vector2 mouse_pos;
 	bool highlight = false;

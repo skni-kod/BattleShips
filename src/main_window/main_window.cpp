@@ -19,6 +19,10 @@ void main_window::loop()
 		case window_type::MENU:
 			menu_update();
 			break;
+		
+		case window_type::GAME_START:
+			game_start();
+			break;
 
 		case window_type::BOARD_INIT:
 			board_init();
@@ -26,6 +30,10 @@ void main_window::loop()
 
 		case window_type::BOARD:
 			board_update();
+			break;
+
+		case window_type::WAIT_INIT:
+			wait_init();
 			break;
 
 		case window_type::WAIT:
@@ -52,6 +60,10 @@ void main_window::loop()
 			wait_draw();
 			break;
 
+		case window_type::GAME_OVER:
+			game_over();
+			break;
+
 		default:
 			break;
 		}
@@ -62,7 +74,7 @@ void main_window::loop()
 
 void main_window::menu_init()
 {
-	connect_btn.action = [&current_window = current_window]() { current_window = window_type::BOARD_INIT; };
+	connect_btn.action = [&current_window = current_window]() { current_window = window_type::GAME_START; };
 
 	current_window = window_type::MENU;
 }
@@ -87,11 +99,39 @@ void main_window::menu_draw()
 	connect_btn.draw();
 }
 
-void main_window::board_init()
+void main_window::game_start()
 {
 	client.connect(hostname, port);
 	client.start();
+	current_window = window_type::WAIT_INIT;
+}
+
+void main_window::wait_init()
+{
+	board.set_view(view_type::opponent);
 	current_window = window_type::WAIT;
+}
+
+void main_window::wait_update()
+{
+	// loop returns true on connection error
+	if (client.loop())
+		quit = true;
+}
+
+void main_window::wait_draw()
+{
+	const char *message = "Opponents turn";
+	DrawText(message, (window_width - MeasureText(message, 20)) / 2, 10, 20, DARKGREEN);
+
+	board.draw();
+}
+
+void main_window::board_init()
+{
+	board.has_guess = true;
+	board.set_view(view_type::player);
+	current_window = window_type::BOARD;
 }
 
 void main_window::board_update()
@@ -100,10 +140,10 @@ void main_window::board_update()
 
 	switch (key)
 	{
-	case KEY_ENTER: {
+	case KEY_SPACE: {
 		if (!board.has_guess) {
 			client.send_guess(board.get_guess());
-			current_window = window_type::WAIT;
+			current_window = window_type::WAIT_INIT;
 		} else {
 			// warn about not guessing
 			std::cout << "Guess befor ending your turn!" << std::endl;
@@ -130,18 +170,8 @@ void main_window::board_update()
 
 void main_window::board_draw() { board.draw(); }
 
-void main_window::wait_update()
+void main_window::game_over()
 {
-	// loop returns true on connection error
-	if (client.loop())
-		quit = true;
-}
-
-void main_window::wait_draw()
-{
-	const char *message = "Opponents turn";
+	const char *message = "Game over!";
 	DrawText(message, (window_width - MeasureText(message, 20)) / 2, 10, 20, DARKGREEN);
-
-	board.set_view(view_type::opponent);
-	board.draw();
-}
+};
