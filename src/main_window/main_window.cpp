@@ -154,9 +154,6 @@ void main_window::board_update()
 		if (!board.has_guess) {
 			client.send_guess(board.get_guess());
 			current_window = window_type::WAIT_INIT;
-		} else {
-			// warn about not guessing
-			std::cout << "Guess befor ending your turn!" << std::endl;
 		}
 	} break;
 
@@ -178,10 +175,16 @@ void main_window::board_update()
 		board.update_selected();
 }
 
-void main_window::board_draw() { board.draw(); }
+void main_window::board_draw()
+{
+	board.draw();
+	const char *message = board.get_message().c_str();
+	DrawText(message, (window_width - MeasureText(message, 20)) / 2, 10, 20, DARKGREEN);
+}
+
 
 void main_window::game_over()
 {
-	const char *message = "Game over!";
-	DrawText(message, (window_width - MeasureText(message, 20)) / 2, 10, 20, DARKGREEN);
+	const char *message = TextFormat("Game over: you %s!", won ? "won" : "lost");
+	DrawText(message, (window_width - MeasureText(message, 40)) / 2, (window_height - 40) / 2, 40, DARKGREEN);
 };

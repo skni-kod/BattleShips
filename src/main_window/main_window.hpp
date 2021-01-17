@@ -55,12 +55,22 @@ private:
 	},
 	[this](uint32_t guess){
 		client.send_validation(board.add_guess(guess));
-		current_window = window_type::BOARD_INIT;
+		if (board.is_game_over()) {
+			client.end();
+			current_window = window_type::GAME_OVER;
+		} else {
+			current_window = window_type::BOARD_INIT;
+		}
 	},
-	[this](bool good) { board.validate_guess(good); }
+	[this](bool good) { board.validate_guess(good); },
+	[this]() {
+		won = true;
+		current_window = window_type::GAME_OVER;
+	}
 	};
 
 	bool quit = false;
+	bool won = false;
 	static constexpr int window_width = 800, window_height = 450;
 	std::string hostname = "127.0.0.1";
 	uint16_t port = 60000;

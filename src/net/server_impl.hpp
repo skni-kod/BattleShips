@@ -43,6 +43,11 @@ private:
 			message_all_clients(msg, client);
 		} break;
 
+		case message_type::end: {
+			std::cout << "[" << client->get_id() << "]: Ending\n";
+			message_all_clients(msg, client);
+		} break;
+
 		default: break;
 		}
 	}

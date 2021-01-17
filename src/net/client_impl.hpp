@@ -10,8 +10,8 @@ class net_client : public net::client_interface<message_type>
 {
 public:
 	net_client(std::function<void()> on_start_func, std::function<void(uint32_t guess)> on_recieve_guess_func,
-		   std::function<void(bool good)> on_recieve_validation_func)
-	    : on_start(on_start_func), on_recieve_guess(on_recieve_guess_func), on_recieve_validation(on_recieve_validation_func){};
+		   std::function<void(bool good)> on_recieve_validation_func, std::function<void()> on_end_func)
+	    : on_start(on_start_func), on_recieve_guess(on_recieve_guess_func), on_recieve_validation(on_recieve_validation_func), on_end(on_end_func){};
 
 	void start()
 	{
@@ -35,6 +35,13 @@ public:
 		msg.header.id = message_type::send_validation;
 
 		msg << good;
+		send(msg);
+	}
+
+	void end()
+	{
+		net::message<message_type> msg;
+		msg.header.id = message_type::end;
 		send(msg);
 	}
 
@@ -73,6 +80,11 @@ public:
 					on_recieve_validation(good);
 				} break;
 
+				case message_type::end: {
+					std::cout << "Ending Game" << std::endl;
+					on_end();
+				} break;
+
 				default:
 					break;
 				}
@@ -88,4 +100,5 @@ private:
 	std::function<void()> on_start;
 	std::function<void(uint32_t guess)> on_recieve_guess;
 	std::function<void(bool guess)> on_recieve_validation;
+	std::function<void()> on_end;
 };
