@@ -1,10 +1,10 @@
 #include "game_board.hpp"
 
-uint8_t game_board::num_cells = 0;
+uint32_t game_board::num_cells = 0;
 float game_board::cell_w = 0;
 float game_board::cell_h = 0;
 
-game_board::game_board(Rectangle rect, uint8_t cells_per_slice)
+game_board::game_board(Rectangle rect, uint32_t cells_per_slice)
     : bounds{rect.x, rect.y, rect.width - 1, rect.height - 1}
 {
 	num_cells = cells_per_slice;

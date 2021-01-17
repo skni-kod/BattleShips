@@ -90,9 +90,7 @@ bool game_ships::valid_layout()
 
 
 	if (s.vertical) {
-		int len =
-		    (ship_indexes.back() / game_board::num_cells) - (ship_indexes.front() / game_board::num_cells);
-		if (len < 0 || len > ship_indexes.size())
+		if (ship_indexes.back() > game_board::num_cells * game_board::num_cells)
 			return false;
 
 		if (!top && check(ship_indexes.front() - y_offset))

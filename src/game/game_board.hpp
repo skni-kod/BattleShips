@@ -22,7 +22,7 @@ class game_board
 public:
 	bool has_guess = false;
 
-	game_board(Rectangle rect, uint8_t cells_per_slice);
+	game_board(Rectangle rect, uint32_t cells_per_slice);
 
 	void set_view(view_type desired_view);
 
@@ -46,7 +46,7 @@ public:
 
 private:
 	Rectangle bounds;
-	static uint8_t num_cells;
+	static uint32_t num_cells;
 	static float cell_w, cell_h;
 	inline static std::vector<Vector2> cells{};
 	std::vector<guess> guesses;
