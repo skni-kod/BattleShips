@@ -9,7 +9,7 @@
  * \param is_vertical Jeśli prawdziwy statek jest w pozycji wertykalnej.
  * Przypisuje nowe indeksy pola indexes na false.
  */
-ship::ship(ship_type type, uint32_t start_index, bool is_vertical) : vertical(is_vertical), type(type)
+ship::ship(ship_type t, uint32_t start_index, bool is_vertical) : type(t), vertical(is_vertical)
 {
 	if (vertical) {
 		for (uint32_t i = 0; i < length(); i++)
@@ -28,7 +28,7 @@ void ship::draw() const
 {
 	for (auto [i, _] : indexes)
 		DrawRectangleV({game_board::cells[i].x + 5, game_board::cells[i].y + 5},
-			       {game_board::cell_w - 10, game_board::cell_h - 10}, LIME);
+			       {game_board::cell_size - 10, game_board::cell_size - 10}, LIME);
 }
 
 /** \memberof game_ships
@@ -58,7 +58,7 @@ bool game_ships::was_hit(uint32_t index)
 			s.indexes[index] = true;
 			return s.indexes[index];
 		}
-			
+
 	}
 	return false;
 }
@@ -182,8 +182,8 @@ bool game_ships::valid_layout()
 	} else {
 		// check if last index is in the same row
 		int len =
-		    (ship_indexes.back() % game_board::num_cells) - (ship_indexes.front() % game_board::num_cells);
-		if (len < 0 || len > ship_indexes.size())
+		    static_cast<int>((ship_indexes.back() % game_board::num_cells) - (ship_indexes.front() % game_board::num_cells));
+		if (len < 0 || len > static_cast<int>(ship_indexes.size()))
 			return false;
 
 		// corner checks

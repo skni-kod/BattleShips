@@ -64,7 +64,7 @@ public:
 private:
 	Rectangle bounds;
 	static uint32_t num_cells;
-	static float cell_w, cell_h;
+	static float cell_size;
 	inline static std::vector<Vector2> cells{};
 	std::unordered_map<uint32_t, guess_type> guesses;
 	std::unordered_map<uint32_t, guess_type> opponent_guesses;
