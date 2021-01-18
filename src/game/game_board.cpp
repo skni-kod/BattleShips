@@ -3,7 +3,7 @@
 uint32_t game_board::num_cells = 0;
 float game_board::cell_size = 0;
 
-/** \memberof game_board
+/**
  * \brief Konstruktor planszy.
  * \param rect Obszar komórek planszy.
  * \param cells_per_slice Rozmiar planszy.
@@ -27,7 +27,7 @@ game_board::game_board(Rectangle rect, uint32_t cells_per_slice)
 	}
 }
 
-/** \memberof game_board
+/**
  * \brief Funkcja przełączająca widok.
  */
 void game_board::toggle_view()
@@ -38,9 +38,19 @@ void game_board::toggle_view()
 		view = view_type::player;
 }
 
-/** \memberof game_board
+/**
+ * \brief Metoda zwracająca wyświetlany widok jako stałą znakową.
+ */
+const char *game_board::get_view_cstr() const
+{
+	if (view == view_type::opponent)
+		return "opponent's";
+	else
+		return "player's";
+}
+
+/**
  * \brief Funkcja dodająca/usuwająca staki.
- * \param vertical_placement wertykalne położenie statku.
  */
 bool game_board::update_ships(bool vertical_placement)
 {
@@ -50,9 +60,17 @@ bool game_board::update_ships(bool vertical_placement)
 	return false;
 }
 
-/** \memberof game_board
+/**
+ * \brief Metoda sprawdzająca i zwracająca skończenie rozkładania statków.
+ */
+bool game_board::is_placement_done()
+{
+	ships.valid_layout();
+	return placement_done;
+}
+
+/**
  * \brief Funkcja dodająca próbę odgadnięcia.
- * \param guess_index Indeks próby.
  */
 guess_type game_board::add_guess(uint32_t guess_index)
 {
@@ -70,9 +88,8 @@ guess_type game_board::add_guess(uint32_t guess_index)
 	return opponent_guesses[guess_index];
 }
 
-/** \memberof game_board
+/**
  * \brief Funkcja dodająca próbę odgadnięcia na indeksie zaznaczonej komórki.
- * \param guess_index Indeks próby.
  */
 uint32_t game_board::get_guess_index()
 {
@@ -80,7 +97,7 @@ uint32_t game_board::get_guess_index()
 	return selected_cell;
 }
 
-/** \memberof game_board
+/**
  * \brief Funkcja aktualizująca indeks pod myszka oraz czy zaznaczenie jest aktywne.
  */
 void game_board::update_highlight()
@@ -93,7 +110,7 @@ void game_board::update_highlight()
 		highlight = false;
 }
 
-/** \memberof game_board
+/**
  * \brief Funkcja usuwająca próbę odgadnięcia na indeksie zaznaczonej komórki.
  */
 void game_board::update_selected()
@@ -110,7 +127,7 @@ void game_board::update_selected()
 	}
 }
 
-/** \memberof game_board
+/**
  * \brief Funkcja rysująca plansze w zależności od widoku.
  */
 void game_board::draw() const
@@ -154,7 +171,7 @@ void game_board::draw() const
 	}
 }
 
-/** \memberof game_board
+/**
  * \brief Funkcja zamieniająca Vector2 na indeks.
  */
 uint32_t game_board::to_index(const Vector2 &v) const
@@ -164,7 +181,7 @@ uint32_t game_board::to_index(const Vector2 &v) const
 	return col + row * num_cells;
 }
 
-/** \memberof game_board
+/**
  * \brief Funkcja rysująca ukośną linie.
  */
 void game_board::draw_line(uint32_t cell_index) const
@@ -174,7 +191,7 @@ void game_board::draw_line(uint32_t cell_index) const
 	DrawLineEx(top_left, bottom_right, 2, selected_color);
 }
 
-/** \memberof game_board
+/**
  * \brief Funkcja rysująca krzyżyk.
  */
 void game_board::draw_cross(uint32_t cell_index) const
@@ -186,7 +203,7 @@ void game_board::draw_cross(uint32_t cell_index) const
 	DrawLineEx(top_right, bottom_left, 2, selected_color);
 }
 
-/** \memberof game_board
+/**
  * \brief Funkcja rysująca kółko.
  */
 void game_board::draw_circle(uint32_t cell_index) const

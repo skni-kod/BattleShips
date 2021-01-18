@@ -9,12 +9,12 @@
 #include "guess_type.hpp"
 #include "game_ships.hpp"
 
-/** \enum view_type
+/**
  * \brief Enum zawierający typy widoku planszy.
  */
 enum class view_type { placement, player, opponent };
 
-/** \class game_board
+/**
  * \brief Klasa planszy.
  */
 class game_board
@@ -24,36 +24,31 @@ class game_board
 
 public:
 	bool has_guess = false;
+	bool game_over = false;
 
 	game_board(Rectangle rect, uint32_t cells_per_slice);
 
-	void set_view(view_type desired_view) { view = desired_view; }
+	/**
+	 * \brief Metoda przypisująca rodzaj wyświetlanego widoku.
+	 */
+	inline void set_view(view_type desired_view) { view = desired_view; }
 
 	void toggle_view();
 
-	inline const char *get_view_cstr() const
-	{
-		if (view == view_type::opponent)
-			return "opponent's";
-		else
-			return "player's";
-	}
+	const char *get_view_cstr() const;
 
 	bool update_ships(bool vertical_placement);
 
-	inline bool is_placement_done()
-	{
-		ships.valid_layout();
-		return placement_done;
-	}
+	bool is_placement_done();
 
 	guess_type add_guess(uint32_t guess_index);
 
-	uint32_t get_guess_index();
-
+	/**
+	 * \brief Metoda przypisująca rodzaj próby zgadnięcia.
+	 */
 	inline void validate_last_guess(guess_type type) { guesses[selected_cell] = type; }
 
-	inline bool is_game_over() { return game_over; }
+	uint32_t get_guess_index();
 
 	void update_highlight();
 
@@ -63,18 +58,21 @@ public:
 
 private:
 	Rectangle bounds;
+
 	static uint32_t num_cells;
 	static float cell_size;
 	inline static std::vector<Vector2> cells{};
-	std::unordered_map<uint32_t, guess_type> guesses;
-	std::unordered_map<uint32_t, guess_type> opponent_guesses;
-	uint32_t selected_cell = 0;
-	game_ships ships;
+
 	view_type view = view_type::placement;
 	static inline bool placement_done = false;
-	bool game_over = false;
+
+	std::unordered_map<uint32_t, guess_type> guesses;
+	std::unordered_map<uint32_t, guess_type> opponent_guesses;
+
+	game_ships ships;
 
 	uint32_t mouse_index;
+	uint32_t selected_cell = 0;
 	bool highlight = false;
 
 	Color normal_color = DARKGREEN;
