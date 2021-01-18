@@ -19,7 +19,7 @@ void main_window::loop()
 		case window_type::MENU:
 			menu_update();
 			break;
-		
+
 		case window_type::GAME_START:
 			game_start();
 			break;
@@ -199,7 +199,7 @@ void main_window::board_update()
 void main_window::board_draw()
 {
 	DrawText("Your turn", 515, 25, 20, GREEN);
-	
+
 	const char *message =
 		"Mouse left:\n\t(select a cell)\n"
 		"V: (change board view)\n\t%s guesses\n"
@@ -220,4 +220,4 @@ void main_window::game_over()
 {
 	const char *message = TextFormat("Game over: you %s!", won ? "won" : "lost");
 	DrawText(message, (window_width - MeasureText(message, 40)) / 2, (window_height - 40) / 2, 40, DARKGREEN);
-};
+}
