@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <cstdint>
 #include <map>
@@ -6,9 +6,17 @@
 #include <raylib.h>
 #include <vector>
 
-// type equals the number of cells it takes up
+/** \enum ship_type
+ * \brief Enum zawierający typy statku, liczba przypisana typowi jest długością tego typu statków.
+ */
 enum class ship_type { submarine = 1, destroyer, cruiser, battleship, carrier };
 
+
+/** \class ship
+ * \brief Klasa statku.
+ * 
+ * Klasa reprezentująca statek.
+ */
 class ship
 {
 	friend class game_ships;
@@ -27,6 +35,12 @@ private:
 	bool sunk = false;
 };
 
+
+/** \class game_ships
+ * \brief Klasa menadżera statków.
+ *
+ * Klasa zarządzająca wektorem ships.
+ */
 class game_ships
 {
 public:

@@ -1,10 +1,15 @@
-#include "selection.hpp"
+﻿#include "selection.hpp"
 #include "../game/game_ships.hpp"
 #include "../main_window/main_window.hpp"
 
 const int MIN_COUNTER = 0;
 const int MAX_COUNTER = 10;
 
+/**
+ * \brief Konstruktor pola wyboru/modyfikacji.
+ * \param vec Pozycja pola.
+ * \param btn_label Format etykiety.
+ */
 selection::selection(Vector2 vec, std::string selection_label_format, ship_type type)
     : label_format(selection_label_format), sel_type(type), sel_btn({}, ""), btn1({}, "-"), btn2({}, "+"), counter(main_window::ship_types_count[type])
 {
@@ -36,6 +41,9 @@ selection::selection(Vector2 vec, std::string selection_label_format, ship_type 
 	};
 }
 
+/**
+ * \brief Metoda aktualizacyjna pola.
+ */
 void selection::update()
 {
 	sel_btn.update();
@@ -49,6 +57,9 @@ void selection::update()
 	btn2.update();
 }
 
+/**
+ * \brief Metoda rysująca pole.
+ */
 void selection::draw()
 {
 	if (highlight)

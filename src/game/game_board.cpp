@@ -1,9 +1,14 @@
-#include "game_board.hpp"
+﻿#include "game_board.hpp"
 
 uint32_t game_board::num_cells = 0;
 float game_board::cell_w = 0;
 float game_board::cell_h = 0;
 
+/** \memberof game_board
+ * \brief Konstruktor planszy.
+ * \param rect Obszar komórek planszy.
+ * \param cells_per_slice Rozmiar planszy.
+ */
 game_board::game_board(Rectangle rect, uint32_t cells_per_slice)
     : bounds{rect.x, rect.y, rect.width - 1, rect.height - 1}
 {
@@ -24,6 +29,9 @@ game_board::game_board(Rectangle rect, uint32_t cells_per_slice)
 	}
 }
 
+/** \memberof game_board
+ * \brief Funkcja przełączająca widok.
+ */
 void game_board::toggle_view()
 {
 	if (view == view_type::player)
@@ -32,6 +40,10 @@ void game_board::toggle_view()
 		view = view_type::player;
 }
 
+/** \memberof game_board
+ * \brief Funkcja dodająca/usuwająca staki.
+ * \param vertical_placement wertykalne położenie statku.
+ */
 bool game_board::update_ships(bool vertical_placement)
 {
 	if (highlight)
@@ -40,13 +52,16 @@ bool game_board::update_ships(bool vertical_placement)
 	return false;
 }
 
+/** \memberof game_board
+ * \brief Funkcja dodająca próbę odgadnięcia.
+ * \param guess_index Indeks próby.
+ */
 guess_type game_board::add_guess(uint32_t guess_index)
 {
 	if (ships.was_hit(guess_index)) {
 		opponent_guesses[guess_index] = guess_type::hit;
 	}
 		
-	
 	if (auto sunk_indexes = ships.get_sunk_indexes(); sunk_indexes.size() != 0) {
 		for (auto i : sunk_indexes)
 			opponent_guesses[i] = guess_type::hit_and_sunk;
@@ -57,12 +72,19 @@ guess_type game_board::add_guess(uint32_t guess_index)
 	return opponent_guesses[guess_index];
 }
 
+/** \memberof game_board
+ * \brief Funkcja dodająca próbę odgadnięcia na indeksie zaznaczonej komórki.
+ * \param guess_index Indeks próby.
+ */
 uint32_t game_board::get_guess_index()
 {
 	guesses[selected_cell] = guess_type::miss;
 	return selected_cell;
 }
 
+/** \memberof game_board
+ * \brief Funkcja aktualizująca indeks pod myszka oraz czy zaznaczenie jest aktywne.
+ */
 void game_board::update_highlight()
 {
 	auto mouse_pos = GetMousePosition();
@@ -73,6 +95,9 @@ void game_board::update_highlight()
 		highlight = false;
 }
 
+/** \memberof game_board
+ * \brief Funkcja usuwająca próbę odgadnięcia na indeksie zaznaczonej komórki.
+ */
 void game_board::update_selected()
 {
 	if (view == view_type::player && highlight) {
@@ -87,6 +112,9 @@ void game_board::update_selected()
 	}
 }
 
+/** \memberof game_board
+ * \brief Funkcja rysująca plansze w zależności od widoku.
+ */
 void game_board::draw() const
 {
 
@@ -128,6 +156,9 @@ void game_board::draw() const
 	}
 }
 
+/** \memberof game_board
+ * \brief Funkcja zamieniająca Vector2 na indeks.
+ */
 uint32_t game_board::to_index(const Vector2 &v) const
 {
 	auto row = static_cast<uint32_t>((v.y - bounds.y) / cell_h);
@@ -135,7 +166,9 @@ uint32_t game_board::to_index(const Vector2 &v) const
 	return col + row * num_cells;
 }
 
-
+/** \memberof game_board
+ * \brief Funkcja rysująca ukośną linie.
+ */
 void game_board::draw_line(uint32_t cell_index) const
 {
 	Vector2 top_left = {cells[cell_index].x + 6, cells[cell_index].y + 6};
@@ -143,6 +176,9 @@ void game_board::draw_line(uint32_t cell_index) const
 	DrawLineEx(top_left, bottom_right, 2, selected_color);
 }
 
+/** \memberof game_board
+ * \brief Funkcja rysująca krzyżyk.
+ */
 void game_board::draw_cross(uint32_t cell_index) const
 {
 	draw_line(cell_index);
@@ -152,6 +188,9 @@ void game_board::draw_cross(uint32_t cell_index) const
 	DrawLineEx(top_right, bottom_left, 2, selected_color);
 }
 
+/** \memberof game_board
+ * \brief Funkcja rysująca kółko.
+ */
 void game_board::draw_circle(uint32_t cell_index) const
 {
 	float radius = cell_w / 2 - 6;
