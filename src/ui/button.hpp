@@ -4,6 +4,9 @@
 #include <raylib.h>
 #include <string>
 
+/**
+ * \brief Klasa guzika.
+ */
 class button
 {
 public:

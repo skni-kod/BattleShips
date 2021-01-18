@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <algorithm>
 #include <cstdint>
@@ -9,8 +9,14 @@
 #include "guess_type.hpp"
 #include "game_ships.hpp"
 
+/** \enum view_type
+ * \brief Enum zawierający typy widoku planszy.
+ */
 enum class view_type { placement, player, opponent };
 
+/** \class game_board
+ * \brief Klasa planszy.
+ */
 class game_board
 {
 	friend class ship;

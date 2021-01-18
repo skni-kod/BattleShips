@@ -12,6 +12,9 @@ add_library(project_warnings INTERFACE)
 include(cmake/Warnings.cmake)
 set_project_warnings(project_warnings)
 
+include(cmake/Doxygen.cmake)
+enable_doxygen()
+
 include(FetchContent)
 
 find_package(raylib 3.0 QUIET)

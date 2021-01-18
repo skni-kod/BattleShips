@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <raylib.h>
 #include <string>
@@ -10,8 +10,16 @@
 #include "../ui/button.hpp"
 #include "../ui/selection.hpp"
 
+/**
+ * \brief Enum zawierający typy próby odgadnięcia.
+ */
 enum class window_type { MENU_INIT, MENU, GAME_START, BOARD_INIT, BOARD, WAIT_INIT, WAIT, GAME_OVER };
 
+/**
+ * \brief Klasa głównego okna.
+ * Metody z przedrostkami menu, game, wait, board odpowiednio incjalizują, aktualizują oraz rysują
+ * poszczególne rodzaje wyświetlania.
+ */
 class main_window
 {
 	friend class selection;
