@@ -13,7 +13,7 @@ include(cmake/Warnings.cmake)
 set_project_warnings(project_warnings)
 
 include(cmake/Doxygen.cmake)
-enable_doxygen()
+enable_doxygen(src/)
 
 include(FetchContent)
 

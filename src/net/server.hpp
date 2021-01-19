@@ -7,15 +7,26 @@
 
 namespace net
 {
+/**
+ * \brief Klasa serwera.
+ */
 template <typename T> class server_interface
 {
 public:
-	// Create a server, ready to listen on specified port
+	/**
+	 * \brief Konstruktor klasy serwera.
+	 */
 	server_interface(uint16_t port) : acceptor(context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)) {}
 
+	/**
+	 * \brief Destruktor klasy serwera.
+	 */
 	virtual ~server_interface() { stop(); }
 
-	// Starts the server, which waits for connecitons and starts a thread for asio context
+	/**
+	 * \brief Metoda startująca działanie serwera.
+	 * Wywołuje funkcje asynchronicznie czekjącą na połączenia oraz tworzy wątek dla asio.
+	 */
 	bool start()
 	{
 		try {
@@ -31,7 +42,9 @@ public:
 		return true;
 	}
 
-	// Stops the server and joins the threads
+	/**
+	 * \brief Metoda zatrzymująca działanie serwera.
+	 */
 	void stop()
 	{
 		context.stop();
@@ -42,23 +55,22 @@ public:
 		std::cout << "[SERVER] Stopped!\n";
 	}
 
-	// Asynchronously wait for connection
+	/**
+	 * \brief Metoda asynchronicznie czekająca na połączenia.
+	 * Przy nowym połączeniu tworzone są wskaźniki współdzielone i dodawane do kolejki połączeń.
+	 */
 	void wait_for_connection()
 	{
 		acceptor.async_accept([this](std::error_code ec, asio::ip::tcp::socket socket) {
 			if (!ec) {
 				std::cout << "[SERVER] New Connection: " << socket.remote_endpoint() << "\n";
 
-				// create a new connection to handle this client
 				std::shared_ptr<connection<T>> newconn = std::make_shared<connection<T>>(
 				    connection<T>::owner::server, context, std::move(socket), input_messages);
 
-				// trigger the user function
 				if (on_client_connect(newconn)) {
-					// connection allowed, so add to container of new connections
 					connections.push_back(std::move(newconn));
 
-					// issue async reading task
 					connections.back()->connect_to_client(id_counter++);
 
 					std::cout << "[" << connections.back()->get_id() << "] Connection Approved\n";
@@ -74,7 +86,9 @@ public:
 		});
 	}
 
-	// Send a message to a specific client
+	/**
+	 * \brief Metoda wysyłająca wiadomość do konkretnego klienta.
+	 */
 	void message_client(std::shared_ptr<connection<T>> client, const message<T> &msg)
 	{
 		if (client && client->is_connected()) {
@@ -90,7 +104,10 @@ public:
 		}
 	}
 
-	// Send message to all clients
+	/**
+	 * \brief Metoda wysyłająca wiadomość do wszystkich klientów.
+	 * \param ignored_client wskaźnik na klienta którego pominąć przy wysyłaniu.
+	 */
 	void message_all_clients(const message<T> &msg, std::shared_ptr<connection<T>> ignored_client = nullptr)
 	{
 		bool invalid_client_exists = false;
@@ -114,7 +131,9 @@ public:
 					  connections.end());
 	}
 
-	// Force server to respond to incoming messages
+	/**
+	 * \brief Metoda główna serwera.
+	 */
 	void update(size_t max_msgs_count = SIZE_MAX, bool wait = false)
 	{
 		if (wait)
@@ -131,17 +150,21 @@ public:
 	}
 
 protected:
-	// Called when a client connects, you can veto the connection by returning false
+	/**
+	 * \brief Metoda wirtualna serwera wywoływana przy połączeniu nowego klienta.
+	 */
 	virtual bool on_client_connect(std::shared_ptr<connection<T>> client [[maybe_unused]]) { return false; }
 
-	// Called when a client appears to have disconnected
+	/**
+	 * \brief Metoda wirtualna serwera wywoływana przy rozłączeniu nowego klienta.
+	 */
 	virtual void on_client_disconnect(std::shared_ptr<connection<T>> client [[maybe_unused]]) {}
 
-	// Called when a message arrives
+	/**
+	 * \brief Metoda wirtualna serwera wywoływana przy przychodzącej wiadomości.
+	 */
 	virtual void on_message(std::shared_ptr<connection<T>> client [[maybe_unused]],
-				message<T> &msg [[maybe_unused]])
-	{
-	}
+				message<T> &msg [[maybe_unused]]) {}
 
 protected:
 	tsqueue<owned_message<T>> input_messages;

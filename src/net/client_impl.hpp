@@ -7,13 +7,22 @@
 #include "net.hpp"
 #include "../game/guess_type.hpp"
 
+/**
+ * \brief Implementacja klasy klient.
+ */
 class net_client : public net::client_interface<message_type>
 {
 public:
+	/**
+	 * \brief Konstruktor implementacji klasy klient.
+	 */
 	net_client(std::function<void()> on_start_func, std::function<void(uint32_t guess_index)> on_recieve_guess_func,
 		   std::function<void(guess_type type)> on_recieve_validation_func, std::function<void()> on_end_func)
 	    : on_start(on_start_func), on_recieve_guess(on_recieve_guess_func), on_recieve_validation(on_recieve_validation_func), on_end(on_end_func){};
 
+	/**
+	 * \brief Metoda wysyłająca start.
+	 */
 	void start()
 	{
 		net::message<message_type> msg;
@@ -21,6 +30,9 @@ public:
 		send(msg);
 	}
 
+	/**
+	 * \brief Metoda wysyłająca próbę zgadnięcia.
+	 */
 	void send_guess(uint32_t guess)
 	{
 		net::message<message_type> msg;
@@ -30,6 +42,9 @@ public:
 		send(msg);
 	}
 
+	/**
+	 * \brief Metoda wysyłająca walidację próby zgadnięcia.
+	 */
 	void send_validation(guess_type type)
 	{
 		net::message<message_type> msg;
@@ -39,6 +54,9 @@ public:
 		send(msg);
 	}
 
+	/**
+	 * \brief Metoda wysyłająca koniec.
+	 */
 	void end()
 	{
 		net::message<message_type> msg;
@@ -46,6 +64,9 @@ public:
 		send(msg);
 	}
 
+	/**
+	 * \brief Metoda reagująca na przychodzące wiadomości.
+	 */
 	bool loop()
 	{
 		if (is_connected()) {

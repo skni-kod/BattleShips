@@ -4,6 +4,9 @@
 
 namespace net
 {
+/**
+ * \brief Klasa kolejki zabezpieczona wątkowo.
+ */
 template <typename T> class tsqueue
 {
 public:
@@ -12,21 +15,27 @@ public:
 	virtual ~tsqueue() { clear(); }
 
 public:
-	// Returns and maintains item at front of queue
+	/**
+	 * \brief Zwraca element na przodzie kolejki.
+	 */
 	const T &front()
 	{
 		std::scoped_lock lock(queue_mux);
 		return dequeue.front();
 	}
 
-	// Returns and maintains item at back of queue
+	/**
+	 * \brief Zwraca element na tyle kolejki.
+	 */
 	const T &back()
 	{
 		std::scoped_lock lock(queue_mux);
 		return dequeue.back();
 	}
 
-	// Removes and returns item from front of queue
+	/**
+	 * \brief Usuwa i zwraca element na przodzie kolejki.
+	 */
 	T pop_front()
 	{
 		std::scoped_lock lock(queue_mux);
@@ -35,7 +44,9 @@ public:
 		return t;
 	}
 
-	// Removes and returns item from back of queue
+	/**
+	 * \brief Usuwa i zwraca element na tyle kolejki.
+	 */
 	T pop_back()
 	{
 		std::scoped_lock lock(queue_mux);
@@ -44,7 +55,9 @@ public:
 		return t;
 	}
 
-	// Adds an item to back of queue
+	/**
+	 * \brief Dodaje element do tyłu kolejki.
+	 */
 	void push_back(const T &item)
 	{
 		std::scoped_lock lock(queue_mux);
@@ -54,7 +67,9 @@ public:
 		cv.notify_one();
 	}
 
-	// Adds an item to front of queue
+	/**
+	 * \brief Dodaje element do przodu kolejki.
+	 */
 	void push_front(const T &item)
 	{
 		std::scoped_lock lock(queue_mux);
@@ -64,27 +79,36 @@ public:
 		cv.notify_one();
 	}
 
-	// Returns true if queue has no items
+	/**
+	 * \brief Zwraca true jeśli kolejka jest pusta.
+	 */
 	bool empty()
 	{
 		std::scoped_lock lock(queue_mux);
 		return dequeue.empty();
 	}
 
-	// Returns number of items in queue
+	/**
+	 * \brief Zwraca liczbę elementów kolejki.
+	 */
 	size_t count()
 	{
 		std::scoped_lock lock(queue_mux);
 		return dequeue.size();
 	}
 
-	// Clears queue
+	/**
+	 * \brief Usuwa wszystkie elementy kolejki.
+	 */
 	void clear()
 	{
 		std::scoped_lock lock(queue_mux);
 		dequeue.clear();
 	}
 
+	/**
+	 * \brief Metoda blokująca.
+	 */
 	void wait()
 	{
 		while (empty()) {

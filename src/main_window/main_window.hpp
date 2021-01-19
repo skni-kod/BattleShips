@@ -64,7 +64,7 @@ private:
 	[this](uint32_t guess_index){
 		client.send_validation(board.add_guess(guess_index));
 
-		if (board.is_game_over()) {
+		if (board.game_over) {
 			client.end();
 			current_window = window_type::GAME_OVER;
 		} else {
