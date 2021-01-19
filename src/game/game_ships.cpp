@@ -144,7 +144,7 @@ bool game_ships::valid_layout()
 
 	if (s.vertical) {
 		// check if last index is in bounds
-		if (ship_indexes.back() > game_board::num_cells * game_board::num_cells)
+		if (ship_indexes.back() >= game_board::num_cells * game_board::num_cells)
 			return false;
 
 		// corner checks
