@@ -2,14 +2,11 @@
 #include "../game/game_ships.hpp"
 #include "../main_window/main_window.hpp"
 
+/// \brief Minimalna liczba statków danego typu.
 const int MIN_COUNTER = 0;
+/// \brief Maksymalna liczba statków danego typu.
 const int MAX_COUNTER = 10;
 
-/**
- * \brief Konstruktor pola wyboru/modyfikacji.
- * \param vec Pozycja pola.
- * \param btn_label Format etykiety.
- */
 selection::selection(Vector2 vec, std::string selection_label_format, ship_type type)
     : label_format(selection_label_format), sel_type(type), sel_btn({}, ""), btn1({}, "-"), btn2({}, "+"), counter(main_window::ship_types_count[type])
 {
@@ -41,32 +38,26 @@ selection::selection(Vector2 vec, std::string selection_label_format, ship_type 
 	};
 }
 
-/**
- * \brief Metoda aktualizacyjna pola.
- */
 void selection::update()
 {
 	sel_btn.update();
 	if (main_window::selected_ship_type == sel_type)
 		highlight = true;
 	else
-		highlight = false; 
+		highlight = false;
 
 
 	btn1.update();
 	btn2.update();
 }
 
-/**
- * \brief Metoda rysująca pole.
- */
 void selection::draw()
 {
 	if (highlight)
 		DrawRectangleLinesEx({bounds.x - 5, bounds.y - 5, bounds.width, bounds.height + 10}, 1, highlight_color);
 
 	DrawText(TextFormat(label_format.c_str(), counter), static_cast<int>(bounds.x), static_cast<int>(bounds.y), font_size, label_color);
-	
+
 	sel_btn.draw();
 	btn1.draw();
 	btn2.draw();

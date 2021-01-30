@@ -7,24 +7,22 @@
 
 namespace net
 {
-/**
- * \brief Klasa serwera.
- */
+/// \brief Klasa serwera.
 template <typename T> class server_interface
 {
 public:
 	/**
 	 * \brief Konstruktor klasy serwera.
+	 * \param port Port serwera.
 	 */
 	server_interface(uint16_t port) : acceptor(context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)) {}
 
-	/**
-	 * \brief Destruktor klasy serwera.
-	 */
+	/// \brief Destruktor klasy serwera.
 	virtual ~server_interface() { stop(); }
 
 	/**
 	 * \brief Metoda startująca działanie serwera.
+	 *
 	 * Wywołuje funkcje asynchronicznie czekjącą na połączenia oraz tworzy wątek dla asio.
 	 */
 	bool start()
@@ -42,9 +40,7 @@ public:
 		return true;
 	}
 
-	/**
-	 * \brief Metoda zatrzymująca działanie serwera.
-	 */
+	/// \brief Metoda zatrzymująca działanie serwera.
 	void stop()
 	{
 		context.stop();
@@ -57,6 +53,7 @@ public:
 
 	/**
 	 * \brief Metoda asynchronicznie czekająca na połączenia.
+	 *
 	 * Przy nowym połączeniu tworzone są wskaźniki współdzielone i dodawane do kolejki połączeń.
 	 */
 	void wait_for_connection()
@@ -86,9 +83,7 @@ public:
 		});
 	}
 
-	/**
-	 * \brief Metoda wysyłająca wiadomość do konkretnego klienta.
-	 */
+	/// \brief Metoda wysyłająca wiadomość do konkretnego klienta.
 	void message_client(std::shared_ptr<connection<T>> client, const message<T> &msg)
 	{
 		if (client && client->is_connected()) {
@@ -106,6 +101,7 @@ public:
 
 	/**
 	 * \brief Metoda wysyłająca wiadomość do wszystkich klientów.
+	 *
 	 * \param ignored_client wskaźnik na klienta którego pominąć przy wysyłaniu.
 	 */
 	void message_all_clients(const message<T> &msg, std::shared_ptr<connection<T>> ignored_client = nullptr)
@@ -131,9 +127,7 @@ public:
 					  connections.end());
 	}
 
-	/**
-	 * \brief Metoda główna serwera.
-	 */
+	/// \brief Metoda główna serwera.
 	void update(size_t max_msgs_count = SIZE_MAX, bool wait = false)
 	{
 		if (wait)
@@ -150,19 +144,13 @@ public:
 	}
 
 protected:
-	/**
-	 * \brief Metoda wirtualna serwera wywoływana przy połączeniu nowego klienta.
-	 */
+	/// \brief Metoda wirtualna serwera wywoływana przy połączeniu nowego klienta.
 	virtual bool on_client_connect(std::shared_ptr<connection<T>> client [[maybe_unused]]) { return false; }
 
-	/**
-	 * \brief Metoda wirtualna serwera wywoływana przy rozłączeniu nowego klienta.
-	 */
+	/// \brief Metoda wirtualna serwera wywoływana przy rozłączeniu nowego klienta.
 	virtual void on_client_disconnect(std::shared_ptr<connection<T>> client [[maybe_unused]]) {}
 
-	/**
-	 * \brief Metoda wirtualna serwera wywoływana przy przychodzącej wiadomości.
-	 */
+	/// \brief Metoda wirtualna serwera wywoływana przy przychodzącej wiadomości.
 	virtual void on_message(std::shared_ptr<connection<T>> client [[maybe_unused]],
 				message<T> &msg [[maybe_unused]]) {}
 

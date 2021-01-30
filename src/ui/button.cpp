@@ -1,17 +1,9 @@
 ﻿#include "button.hpp"
 
-/**
- * \brief Konstruktor guzika.
- * \param rect Obszar guzika
- * \param btn_label Etykieta guzika.
- */
 button::button(Rectangle rect, std::string btn_label) : bounds(rect), label(btn_label)
 {
 }
 
-/**
- * \brief Metoda aktualizacyjna guzika.
- */
 void button::update()
 {
 	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
@@ -19,9 +11,6 @@ void button::update()
 			action();
 }
 
-/**
- * \brief Metoda rysująca guzik jako prostokąt o danym kolorze oraz wyśrodkowana etykieta.
- */
 void button::draw()
 {
 	DrawRectangleRec(bounds, bg_color);

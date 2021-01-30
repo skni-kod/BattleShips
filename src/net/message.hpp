@@ -6,6 +6,7 @@ namespace net
 {
 /**
  * \brief Struktura nagłówka wiadomości.
+ *
  * Przechowuje typ oraz rozmiar wiadomości.
  */
 template <typename T> struct message_header {
@@ -15,6 +16,7 @@ template <typename T> struct message_header {
 
 /**
  * \brief Struktura wiadomości.
+ *
  * Ciało wiadomości przechowywane jest w wektorze, jeżeli zmieniamy jego długość
  * to trzeba zaktualizować nagłówek.
  */
@@ -22,14 +24,10 @@ template <typename T> struct message {
 	message_header<T> header{};
 	std::vector<uint8_t> body;
 
-	/**
-	 * \brief Metoda zwracająca rozmiar ciała wiadomości.
-	 */
+	/// \brief Metoda zwracająca rozmiar ciała wiadomości.
 	size_t size() const { return body.size(); }
 
-	/**
-	 * \brief Funkcja wyświetlajaca wiadomość.
-	 */
+	/// \brief Funkcja zaprzyjaźniona wyświetlajaca wiadomość.
 	friend std::ostream &operator<<(std::ostream &os, const message<T> &msg)
 	{
 		os << "ID:" << int(msg.header.id) << " Size:" << msg.header.size;
@@ -38,6 +36,7 @@ template <typename T> struct message {
 
 	/**
 	 * \brief Metoda dodająca dane do wiadomości.
+	 *
 	 * Dane muszą być linearnymi strukturami danych.
 	 */
 	template <typename DataType> friend message<T> &operator<<(message<T> &msg, const DataType &data)
@@ -57,6 +56,7 @@ template <typename T> struct message {
 
 	/**
 	 * \brief Metoda wyciągająca dane z wiadomości.
+	 *
 	 * Dane muszą być linearnymi strukturami danych.
 	 */
 	template <typename DataType> friend message<T> &operator>>(message<T> &msg, DataType &data)
@@ -79,15 +79,14 @@ template <typename T> class connection;
 
 /**
  * \brief Struktura wiadomości z właścicielem.
+ *
  * Zawiera wskaźnik współdzielony do serwera jeśli jest to wiadomość serwera.
  */
 template <typename T> struct owned_message {
 	std::shared_ptr<connection<T>> remote = nullptr;
 	message<T> msg;
 
-	/**
-	 * \brief Metoda wywołująca opertor wypisania wiadomości.
-	 */
+	/// \brief Funkcja zaprzyjaźniona wywołująca opertor wypisania wiadomości.
 	friend std::ostream &operator<<(std::ostream &os, const owned_message<T> &message)
 	{
 		os << message.msg;
