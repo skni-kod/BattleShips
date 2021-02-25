@@ -13,10 +13,11 @@ Sieciowa adaptacja znanej i lubianej gry w okręty.
   - zmiana czasu tury.
 
 # Aktualny stan
+Aktualnie z założeń projektowych wykonane są poszczególne punkty:
 - serwer umożliwia tylko jedną rozgrywkę,
 - serwer akceptuje wszystkie połączenia, brak walidacji klienta,
 - prosta komunikacja między klientem i  serwerem,
-- zmiany reguł gry nie są sprawdzane między klientami,
+- zmiany reguł gry nie są sprawdzane między klientami.
 
 # Wspomaganie projektu
 Wymagania/czego można się nauczyć:
