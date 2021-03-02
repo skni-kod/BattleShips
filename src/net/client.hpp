@@ -6,27 +6,14 @@
 
 namespace net
 {
-/**
- * \brief Klasa klienta.
- */
 template <typename T> class client_interface
 {
 public:
-	/**
-	 * \brief Konstruktor klasy klienta.
-	 */
 	client_interface() {}
 
-	/**
-	 * \brief Destruktor klasy klienta.
-	 */
 	virtual ~client_interface() { disconnect(); }
 
 public:
-	/**
-	 * \brief Metoda łącząca klienta do serwera.
-	 * Łączy z serwerem oraz rozpoczyna nowy wątek dla asio.
-	 */
 	bool connect(const std::string &host, const uint16_t port)
 	{
 		try {
@@ -46,9 +33,6 @@ public:
 		return true;
 	}
 
-	/**
-	 * \brief Metoda rozłączająca z serwerem.
-	 */
 	void disconnect()
 	{
 		if (is_connected()) {
@@ -62,9 +46,6 @@ public:
 		server_connection.release();
 	}
 
-	/**
-	 * \brief Metoda zwracająca true jeśli klient jest połączony do serwera.
-	 */
 	bool is_connected()
 	{
 		if (server_connection)
@@ -74,18 +55,12 @@ public:
 	}
 
 public:
-	/**
-	 * \brief Metoda wysyłająca wiadomość do serwera przez połączenie.
-	 */
 	void send(const message<T> &msg)
 	{
 		if (is_connected())
 			server_connection->send(msg);
 	}
 
-	/**
-	 * \brief Metoda zwracająca referencje do przychodzących wiadomości.
-	 */
 	tsqueue<owned_message<T>> &incoming() { return input_messages; }
 
 protected:

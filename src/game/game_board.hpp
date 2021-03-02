@@ -9,14 +9,8 @@
 #include "guess_type.hpp"
 #include "game_ships.hpp"
 
-/**
- * \brief Enum zawierający typy widoku planszy.
- */
 enum class view_type { placement, player, opponent };
 
-/**
- * \brief Klasa planszy.
- */
 class game_board
 {
 	friend class ship;
@@ -28,9 +22,6 @@ public:
 
 	game_board(Rectangle rect, uint32_t cells_per_slice);
 
-	/**
-	 * \brief Metoda przypisująca rodzaj wyświetlanego widoku.
-	 */
 	inline void set_view(view_type desired_view) { view = desired_view; }
 
 	void toggle_view();
@@ -43,9 +34,6 @@ public:
 
 	guess_type add_guess(uint32_t guess_index);
 
-	/**
-	 * \brief Metoda przypisująca rodzaj próby zgadnięcia.
-	 */
 	inline void validate_last_guess(guess_type type) { guesses[selected_cell] = type; }
 
 	uint32_t get_guess_index();

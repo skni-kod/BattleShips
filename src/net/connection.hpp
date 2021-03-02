@@ -7,16 +7,10 @@
 
 namespace net
 {
-	/**
-	 * \brief Klasa połączenia.
-	 */
 	template<typename T>
 	class connection : public std::enable_shared_from_this<connection<T>>
 	{
 	public:
-		/**
-		 * \brief Enum typu właściciela do tworzenia wiadomości z właścicielem.
-		 */
 		enum class owner
 		{
 			server,
@@ -24,9 +18,6 @@ namespace net
 		};
 
 	public:
-		/**
-		 * \brief Konstruktor klasy połączenia.
-		 */
 		connection(owner parent, asio::io_context& ctx, asio::ip::tcp::socket sock, tsqueue<owned_message<T>>& input)
 			: context(ctx), socket(std::move(sock)), input_messages(input)
 		{
@@ -36,18 +27,12 @@ namespace net
 		virtual ~connection()
 		{}
 
-		/**
-		 * \brief Metoda zwracająca id.
-		 */
 		uint32_t get_id() const
 		{
 			return id;
 		}
 
 	public:
-		/**
-		 * \brief Metoda łacząca z klientem.
-		 */
 		void connect_to_client(uint32_t uid = 0)
 		{
 			if (owner_type == owner::server)
@@ -60,9 +45,6 @@ namespace net
 			}
 		}
 
-		/**
-		 * \brief Metoda łacząca z serwerem.
-		 */
 		void connect_to_server(const asio::ip::tcp::resolver::results_type& endpoints)
 		{
 			if (owner_type == owner::client)
@@ -78,27 +60,18 @@ namespace net
 			}
 		}
 
-		/**
-		 * \brief Metoda rozłączająca.
-		 */
 		void disconnect()
 		{
 			if (is_connected())
 				asio::post(context, [this]() { socket.close(); });
 		}
 
-		/**
-		 * \brief Metoda zwraca true jeśli połączonie jest otwarte.
-		 */
 		bool is_connected() const
 		{
 			return socket.is_open();
 		}
 
 	public:
-		/**
-		 * \brief Metoda asynchronicznie wysyłająca wiadomość.
-		 */
 		void send(const message<T>& msg)
 		{
 			asio::post(context,
@@ -116,9 +89,6 @@ namespace net
 
 
 	private:
-		/**
-		 * \brief Metoda asynchronicznie wysyłająca nagłówek wiadomości.
-		 */
 		void write_header()
 		{
 			asio::async_write(socket, asio::buffer(&output_messages.front().header, sizeof(message_header<T>)),
@@ -150,9 +120,6 @@ namespace net
 				});
 		}
 
-		/**
-		 * \brief Metoda asynchronicznie wysyłająca ciało wiadomości.
-		 */
 		void write_body()
 		{
 			asio::async_write(socket, asio::buffer(output_messages.front().body.data(), output_messages.front().body.size()),
@@ -176,9 +143,6 @@ namespace net
 				});
 		}
 
-		/**
-		 * \brief Metoda asynchronicznie odbierająca nagłówek wiadomości.
-		 */
 		void read_header()
 		{
 			asio::async_read(socket, asio::buffer(&temporary_input.header, sizeof(message_header<T>)),
@@ -205,9 +169,6 @@ namespace net
 				});
 		}
 
-		/**
-		 * \brief Metoda asynchronicznie odbierająca ciało wiadomości.
-		 */
 		void read_body()
 		{
 			asio::async_read(socket, asio::buffer(temporary_input.body.data(), temporary_input.body.size()),
@@ -225,10 +186,6 @@ namespace net
 				});
 		}
 
-		/**
-		 * \brief Metoda dodająca wiadmość w zależności od właściciela.
-		 * Po dodaniu metoda wywołuje asynchroniczne odbieranie które czeka na następną wiadomość.
-		 */
 		void add_to_incoming()
 		{
 			if(owner_type == owner::server)

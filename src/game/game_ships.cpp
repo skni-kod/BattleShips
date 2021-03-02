@@ -2,10 +2,6 @@
 #include "game_board.hpp"
 #include "../main_window/main_window.hpp"
 
-/**
- * \brief Konstruktor statku.
- * Przypisuje nowe indeksy pola indexes na false.
- */
 ship::ship(ship_type t, uint32_t start_index, bool is_vertical) : type(t), vertical(is_vertical)
 {
 	if (vertical) {
@@ -17,10 +13,6 @@ ship::ship(ship_type t, uint32_t start_index, bool is_vertical) : type(t), verti
 	}
 }
 
-/**
- * \brief Metoda rysująca statku.
- * Rysuje każdy indeks statku na ekranie jako kwadrat o kolorze limonkowym.
- */
 void ship::draw() const
 {
 	for (auto [i, _] : indexes)
@@ -28,10 +20,6 @@ void ship::draw() const
 			       {game_board::cell_size - 10, game_board::cell_size - 10}, LIME);
 }
 
-/**
- * \brief Metoda sprawdzająca.
- * Sprawdza indeksy wszystkich statków czy zawierają szukany indeks.
- */
 bool game_ships::check(uint32_t index, bool ignore_last)
 {
 	for (auto it = ships.begin(); it != ships.end() - (ignore_last ? 1 : 0); it++) {
@@ -41,10 +29,6 @@ bool game_ships::check(uint32_t index, bool ignore_last)
 	return false;
 }
 
-/**
- * \brief Funkcja sprawdzająca trafienie.
- * Sprawdza indeksy wszystkich statków jeśli istnieją ustawia ich wartości na true.
- */
 bool game_ships::was_hit(uint32_t index)
 {
 	for (auto &s : ships) {
@@ -57,11 +41,6 @@ bool game_ships::was_hit(uint32_t index)
 	return false;
 }
 
-/**
- * \brief Funkcja zwracjąca ostatnio zatopione indeksy.
- * Sprawdza i ustawia zatopione statki, jeśli dany statek nie jest zatopiony ale wszystkie jego indeksy
- * są ustawione na true to jego indeksy zostają zwrócone.
- */
 std::vector<uint32_t> game_ships::get_sunk_indexes()
 {
 	std::vector<uint32_t> sunk_indexes;
@@ -84,9 +63,6 @@ std::vector<uint32_t> game_ships::get_sunk_indexes()
 	return sunk_indexes;
 }
 
-/**
- * \brief Funkcja sprawdzająca czy wszystkie statki są zatopione.
- */
 bool game_ships::all_sunk()
 {
 	for (auto &s : ships)
@@ -95,18 +71,6 @@ bool game_ships::all_sunk()
 	return true;
 }
 
-/**
- * \brief Funkcja sprawdzająca rozłożenie statków.
- * Sprawdza czy przy układaniu statków zachowano reguły:
- * - ilość statków większa od zera.
- * - ilośc typów statków <= limitowi
- * - dwa statki nie mają tego samego indeksu
- * - jeśli statek wertykalny to czy jego końcowy indeks jest mniejszy niż rozmiar planszy
- * - jeśli statke horyzontalny to czy jego indeksy początkowy i końcowe są na tym samym wierszu
- * - indeksy wokół statku nie są zajęte
- *
- * Funkcja ustawia także zmienna statyczną klasy game_board która sygnalizuję skończenie układania.
- */
 bool game_ships::valid_layout()
 {
 	if (ships.size() == 0)
@@ -214,13 +178,6 @@ bool game_ships::valid_layout()
 	return true;
 }
 
-/**
- * \param index indeks początkowy dodawanego statku lub indeks istnięjącego
- * \brief Funkcja dodająca lub usuwająca statek.
- * Jeśli znaleziono statek z podanym indeksem to usuń ten statek.
- * W przeciwnym wypadku dodajemy nowy statek do wektora oraz sprawdzamy
- * czy rozłożenie statków jest zgodne z regułami.
- */
 bool game_ships::update(uint32_t index, bool vertical_placement)
 {
 	auto ship_to_remove =
@@ -238,9 +195,6 @@ bool game_ships::update(uint32_t index, bool vertical_placement)
 	return true;
 }
 
-/**
- * \brief Metoda rysująca statki.
- */
 void game_ships::draw() const
 {
 	for (const auto &s : ships) {
