@@ -3,9 +3,6 @@
 #include "message_type.hpp"
 #include "net.hpp"
 
-/**
- * \brief Implementacja klasy serwera.
- */
 class net_server : public net::server_interface<message_type>
 {
 public:

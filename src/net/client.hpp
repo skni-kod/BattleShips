@@ -6,9 +6,6 @@
 
 namespace net
 {
-/**
- * \brief Klasa klienta.
- */
 template <typename T> class client_interface
 {
 public:

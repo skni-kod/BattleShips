@@ -7,9 +7,6 @@
 
 namespace net
 {
-/**
- * \brief Klasa serwera.
- */
 template <typename T> class server_interface
 {
 public:

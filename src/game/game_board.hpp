@@ -9,14 +9,8 @@
 #include "guess_type.hpp"
 #include "game_ships.hpp"
 
-/**
- * \brief Enum zawierający typy widoku planszy.
- */
 enum class view_type { placement, player, opponent };
 
-/**
- * \brief Klasa planszy.
- */
 class game_board
 {
 	friend class ship;

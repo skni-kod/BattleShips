@@ -7,9 +7,6 @@
 #include "net.hpp"
 #include "../game/guess_type.hpp"
 
-/**
- * \brief Implementacja klasy klient.
- */
 class net_client : public net::client_interface<message_type>
 {
 public:

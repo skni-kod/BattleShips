@@ -4,9 +4,6 @@
 
 enum class ship_type;
 
-/**
- * \brief Klasa pola wyboru oraz modyfikacji ilości typu statku.
- */
 class selection
 {
 public:

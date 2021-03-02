@@ -4,9 +4,6 @@
 
 namespace net
 {
-/**
- * \brief Klasa kolejki zabezpieczona wątkowo.
- */
 template <typename T> class tsqueue
 {
 public:

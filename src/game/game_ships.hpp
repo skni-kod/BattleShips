@@ -6,16 +6,9 @@
 #include <raylib.h>
 #include <vector>
 
-/**
- * \brief Enum zawierający typy statku, liczba przypisana typowi jest długością tego typu statków.
- */
 enum class ship_type { submarine = 1, destroyer, cruiser, battleship, carrier };
 
 
-/**
- * \brief Klasa statku.
- * Klasa reprezentująca statek.
- */
 class ship
 {
 	friend class game_ships;
@@ -35,10 +28,6 @@ private:
 };
 
 
-/**
- * \brief Klasa menadżera statków.
- * Klasa zarządzająca wektorem ze statkami.
- */
 class game_ships
 {
 public:
