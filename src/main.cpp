@@ -20,3 +20,14 @@ int main()
 	return 0;
 }
 #endif
+
+#ifdef UI_TEST
+#include "../src/ui/ui_test_window.hpp"
+
+int main()
+{
+	ui_test_window test;
+	test.loop();
+	return 0;
+}
+#endif

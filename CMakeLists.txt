@@ -74,3 +74,14 @@ add_executable(${PROJECT_NAME}_server src/main.cpp)
 target_compile_definitions(${PROJECT_NAME}_server PRIVATE SERVER)
 target_include_directories(${PROJECT_NAME}_server PRIVATE ${raylib_SOURCE_DIR}/src)
 target_link_libraries(${PROJECT_NAME}_server PRIVATE project_options project_warnings asio)
+
+file(GLOB UI_TEST_SOURCES
+	src/ui/ui.cpp
+	src/ui/ui_test_window.cpp
+	src/main.cpp
+)
+
+add_executable(${PROJECT_NAME}_ui_test ${UI_TEST_SOURCES})
+target_compile_definitions(${PROJECT_NAME}_ui_test PRIVATE UI_TEST)
+target_include_directories(${PROJECT_NAME}_ui_test PRIVATE ${raylib_SOURCE_DIR}/src)
+target_link_libraries(${PROJECT_NAME}_ui_test PRIVATE project_options project_warnings raylib asio)
