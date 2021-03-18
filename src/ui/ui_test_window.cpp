@@ -1,4 +1,5 @@
 #include "ui_test_window.hpp"
+#include "ui.hpp"
 #include <iostream>
 
 ui_test_window::ui_test_window()
@@ -63,6 +64,15 @@ void ui_test_window::draw()
 	}
 	else if (b == 2)
 		selected = 2;
+	
+
+	ui::set_text_input_label_color(GREEN);
+	ui::set_text_input_color(WHITE);
+	ui::set_blink_time(0.25);
+	ui::set_focus_required(true);
+
+	static std::string test_string = "";
+	test_string = ui::text_input(Vector2{1,200}, "Name: ", test_string, 20);
 
     EndDrawing();
 }
