@@ -25,36 +25,40 @@ int main()
 #ifdef EXAMPLE
 #include "net/net.hpp"
 
-enum class CustomMsgTypes : uint32_t {
-	ServerAccept,
-	ServerDeny,
-	ServerPing,
-	MessageAll,
-	ServerMessage,
+enum class custom_msg_types : uint32_t {
+	server_accept,
+	server_deny,
+	server_ping,
+	server_message,
+	vector,
 };
 
 #ifdef CLIENT
 #include <raylib.h>
 
-class CustomClient : public net::client_interface<CustomMsgTypes>
+class custom_client : public net::client_interface<custom_msg_types>
 {
 public:
-	void PingServer()
+	void ping_server()
 	{
-		net::message<CustomMsgTypes> msg;
-		msg.header.id = CustomMsgTypes::ServerPing;
+		net::message<custom_msg_types> msg;
+		msg.header.id = custom_msg_types::server_ping;
 
-		// Caution with this...
-		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+		std::chrono::system_clock::time_point time_now = std::chrono::system_clock::now();
 
-		msg << timeNow;
+		msg << time_now;
 		send(msg);
 	}
 
-	void MessageAll()
-	{
-		net::message<CustomMsgTypes> msg;
-		msg.header.id = CustomMsgTypes::MessageAll;
+	void send_vector(std::vector<int> vec) {
+		net::message<custom_msg_types> msg;
+		msg.header.id = custom_msg_types::vector;
+
+		for (auto &v : vec) {
+			msg << v;
+		}
+		msg << static_cast<size_t>(vec.size());
+
 		send(msg);
 	}
 };
@@ -64,15 +68,31 @@ int main()
 	InitWindow(800, 600, "Battleships");
 	SetTargetFPS(60);
 
-	CustomClient c;
+	custom_client c;
 	c.connect("127.0.0.1", 60000);
 
 	bool quit = false;
+	std::vector<int> vec;
+	std::string num;
 	while (!WindowShouldClose() && !quit) {
+		int key = GetCharPressed();
+
+		while ((key >= '0') && (key <= '9')) {
+			num += static_cast<char>(key);
+			std::cout << "num: " << num << '\n';
+			key = GetCharPressed();
+		}
+
+		if (IsKeyPressed(KEY_A) && (num.length() > 0)) {
+			vec.push_back(std::stoi(num));
+			num.clear();
+		}
+		if (IsKeyPressed(KEY_M)) {
+			c.send_vector(vec);
+			vec.clear();
+		}
 		if (IsKeyPressed(KEY_P))
-			c.PingServer();
-		if (IsKeyPressed(KEY_M))
-			c.MessageAll();
+			c.ping_server();
 		if (IsKeyPressed(KEY_Q))
 			quit = true;
 
@@ -81,27 +101,49 @@ int main()
 				auto msg = c.incoming().pop_front().msg;
 
 				switch (msg.header.id) {
-				case CustomMsgTypes::ServerAccept: {
+				case custom_msg_types::server_accept: {
 					// Server has responded to a ping request
 					std::cout << "Server Accepted Connection\n";
 				} break;
 
-				case CustomMsgTypes::ServerPing: {
+				case custom_msg_types::server_ping: {
 					// Server has responded to a ping request
-					std::chrono::system_clock::time_point timeNow =
+					std::chrono::system_clock::time_point time_now =
 					    std::chrono::system_clock::now();
-					std::chrono::system_clock::time_point timeThen;
-					msg >> timeThen;
+					std::chrono::system_clock::time_point time_then;
+					msg >> time_then;
 					std::cout
-					    << "Ping: " << std::chrono::duration<double>(timeNow - timeThen).count()
+					    << "Ping: " << std::chrono::duration<double>(time_now - time_then).count()
 					    << "\n";
 				} break;
 
-				case CustomMsgTypes::ServerMessage: {
+				case custom_msg_types::server_message: {
 					// Server has responded to a ping request
-					uint32_t clientID;
-					msg >> clientID;
-					std::cout << "Hello from [" << clientID << "]\n";
+					uint32_t client_id;
+					msg >> client_id;
+					std::cout << "Hello from [" << client_id << "]\n";
+				} break;
+
+				case custom_msg_types::vector: {
+					// Server has responded to a ping request
+					std::vector<int> new_vec = {};
+					size_t size;
+
+					msg >> size;
+					new_vec.resize(size);
+
+					for (size_t i = 0; i < size; i++) {
+						msg >> new_vec[i];
+					}
+
+					std::cout << "Recived vector of size " << size << " containing: ";
+					for (auto &x : new_vec) {
+						std::cout << x << ", ";
+					}
+					std::cout << '\n';
+
+					vec.clear();
+					vec.insert(vec.begin(), new_vec.begin(), new_vec.end());
 				} break;
 				default:
 					break;
@@ -116,6 +158,17 @@ int main()
 
 		ClearBackground(BLACK);
 
+		DrawText("new int:", 0, 0, 20, RAYWHITE);
+		DrawText(num.c_str(), 80, 0, 20, RAYWHITE);
+
+		DrawText("vec:", 0, 20, 20, RAYWHITE);
+		int offset = 50;
+		for (auto &v : vec) {
+			auto s = std::to_string(v);
+			DrawText(s.c_str(), offset, 20, 20, RAYWHITE);
+			offset += static_cast<int>(s.length()) * 10 + 10;
+		}
+
 		EndDrawing();
 	}
 
@@ -123,46 +176,42 @@ int main()
 }
 #endif
 #ifdef SERVER
-class CustomServer : public net::server_interface<CustomMsgTypes>
+class custom_server : public net::server_interface<custom_msg_types>
 {
 public:
-	CustomServer(uint16_t nPort) : net::server_interface<CustomMsgTypes>(nPort) {}
+	custom_server(uint16_t nPort) : net::server_interface<custom_msg_types>(nPort) {}
 
 protected:
-	virtual bool on_client_connect(std::shared_ptr<net::connection<CustomMsgTypes>> client)
+	virtual bool on_client_connect(std::shared_ptr<net::connection<custom_msg_types>> client)
 	{
-		net::message<CustomMsgTypes> msg;
-		msg.header.id = CustomMsgTypes::ServerAccept;
+		net::message<custom_msg_types> msg;
+		msg.header.id = custom_msg_types::server_accept;
 		client->send(msg);
 		return true;
 	}
 
 	// Called when a client appears to have disconnected
-	virtual void on_client_disconnect(std::shared_ptr<net::connection<CustomMsgTypes>> client)
+	virtual void on_client_disconnect(std::shared_ptr<net::connection<custom_msg_types>> client)
 	{
 		std::cout << "Removing client [" << client->get_id() << "]\n";
 	}
 
 	// Called when a message arrives
-	virtual void on_message(std::shared_ptr<net::connection<CustomMsgTypes>> client,
-				net::message<CustomMsgTypes> &msg)
+	virtual void on_message(std::shared_ptr<net::connection<custom_msg_types>> client,
+				net::message<custom_msg_types> &msg)
 	{
 		switch (msg.header.id) {
-		case CustomMsgTypes::ServerPing: {
+		case custom_msg_types::server_ping: {
 			std::cout << "[" << client->get_id() << "]: Server Ping\n";
 
 			// Simply bounce message back to client
 			client->send(msg);
 		} break;
 
-		case CustomMsgTypes::MessageAll: {
-			std::cout << "[" << client->get_id() << "]: Message All\n";
+		case custom_msg_types::vector: {
+			std::cout << "[" << client->get_id() << "]: Sending Vector\n";
 
-			// Construct a new message and send it to all clients
-			net::message<CustomMsgTypes> newmsg;
-			newmsg.header.id = CustomMsgTypes::ServerMessage;
-			newmsg << client->get_id();
-			message_all_clients(newmsg, client);
+			message_all_clients(msg, client);
 
 		} break;
 		default:
@@ -173,7 +222,7 @@ protected:
 
 int main()
 {
-	CustomServer server(60000);
+	custom_server server(60000);
 	server.start();
 
 	while (1) {
