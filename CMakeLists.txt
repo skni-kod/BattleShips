@@ -3,6 +3,7 @@ project(
 	battleships
 	DESCRIPTION "Multiplayer battleships game"
 	HOMEPAGE_URL "github.com/skni-kod/battleships"
+	LANGUAGES CXX
 )
 
 add_library(project_options INTERFACE)
@@ -17,11 +18,12 @@ enable_doxygen(src/)
 
 include(FetchContent)
 
-find_package(raylib 3.0 QUIET)
+find_package(raylib QUIET)
 if (NOT raylib_FOUND)
 	FetchContent_Declare(
 		raylib
 		URL https://github.com/raysan5/raylib/archive/master.tar.gz
+		GIT_TAG 3.7.0
 	)
 
 	FetchContent_GetProperties(raylib)
@@ -29,12 +31,12 @@ if (NOT raylib_FOUND)
 		set(FETCHCONTENT_QUIET NO)
 		FetchContent_Populate(raylib)
 		set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-		set(GRAPHICS="GRAPHICS_API_OPENGL_11")
+		set(OPENGL_VERSION "3.3" CACHE BOOL "" FORCE)
 		add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
 	endif()
 endif()
 
-find_package(asio 1.18.0 QUIET)
+find_package(asio QUIET)
 if (NOT asio_FOUND)
 	FetchContent_Declare(
 		asio
@@ -48,8 +50,10 @@ if (NOT asio_FOUND)
 	endif()
 endif()
 add_library(asio INTERFACE)
+
 find_package(Threads)
 target_link_libraries(asio INTERFACE Threads::Threads)
+
 if(MSVC)
 	target_compile_options(asio INTERFACE -DASIO_STANDALONE /experimental:external /external:W0 /external:I ${asio_SOURCE_DIR}/asio/include)
 else()
@@ -72,5 +76,12 @@ target_link_libraries(${PROJECT_NAME}_client PRIVATE project_options project_war
 
 add_executable(${PROJECT_NAME}_server src/main.cpp)
 target_compile_definitions(${PROJECT_NAME}_server PRIVATE SERVER)
-target_include_directories(${PROJECT_NAME}_server PRIVATE ${raylib_SOURCE_DIR}/src)
 target_link_libraries(${PROJECT_NAME}_server PRIVATE project_options project_warnings asio)
+
+add_executable(${PROJECT_NAME}_client_example src/main.cpp)
+target_compile_definitions(${PROJECT_NAME}_client_example PRIVATE CLIENT EXAMPLE)
+target_link_libraries(${PROJECT_NAME}_client_example PRIVATE project_options project_warnings raylib asio)
+
+add_executable(${PROJECT_NAME}_server_example src/main.cpp)
+target_compile_definitions(${PROJECT_NAME}_server_example PRIVATE SERVER EXAMPLE)
+target_link_libraries(${PROJECT_NAME}_server_example PRIVATE project_options project_warnings asio)
