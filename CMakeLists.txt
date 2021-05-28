@@ -66,6 +66,7 @@ file(GLOB PROJECT_SOURCES
 	src/ui/selection.cpp
 	src/game/game_ships.cpp
 	src/game/game_board.cpp
+	src/game/game_net_interface.cpp
 	src/main_window/main_window.cpp
 	src/main.cpp
 )

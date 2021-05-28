@@ -6,11 +6,10 @@
 
 #include "../game/game_board.hpp"
 #include "../game/game_ships.hpp"
-#include "../net/client_impl.hpp"
+#include "../game/game_net_interface.hpp"
 #include "../ui/button.hpp"
 #include "../ui/selection.hpp"
-
-enum class window_type { MENU_INIT, MENU, GAME_START, BOARD_INIT, BOARD, WAIT_INIT, WAIT, GAME_OVER };
+#include "window_type.hpp"
 
 class main_window
 {
@@ -47,50 +46,15 @@ private:
 
 	void game_over();
 
-	window_type current_window = window_type::MENU_INIT;
-	game_board board{{50, 25, 400, 400}, 10};
-	net_client client{
-	[this](){
-		current_window = window_type::BOARD_INIT;
-	},
-	[this](uint32_t guess_index){
-		client.send_validation(board.add_guess(guess_index));
-
-		if (board.game_over) {
-			client.end();
-			current_window = window_type::GAME_OVER;
-		} else {
-			current_window = window_type::BOARD_INIT;
-		}
-	},
-	[this](guess_type type) {
-		board.validate_last_guess(type);
-
-		switch (type) {
-		case guess_type::miss:
-			turn_message = "miss";
-			break;
-
-		case guess_type::hit:
-			turn_message = "hit";
-			break;
-
-		case guess_type::hit_and_sunk:
-			turn_message = "hit and sunk";
-			break;
-		}
-	},
-	[this]() {
-		won = true;
-		current_window = window_type::GAME_OVER;
-	}
-	};
-
-	bool quit = false;
-	bool won = false;
+	bool quit = false, won = false;
 	static constexpr int window_width = 800, window_height = 450;
 	std::string hostname = "127.0.0.1";
 	uint16_t port = 60000;
+	std::string turn_message;
+
+	window_type current_window = window_type::MENU_INIT;
+	game_board board{{50, 25, 400, 400}, 10};
+	game_net_interface game_interface{current_window, turn_message, won, board};
 
 	static inline ship_type selected_ship_type = ship_type::submarine;
 
@@ -106,6 +70,4 @@ private:
 	selection select_carriers{{515, 330}, "Carriers: %d   ", ship_type::carrier};
 
 	button connect_btn{{515, 375, 220, 50}, "CONNECT"};
-
-	std::string turn_message;
 };

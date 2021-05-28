@@ -1,18 +1,26 @@
 #pragma once
 
-#include <functional>
 #include <iostream>
 
 #include "message_type.hpp"
 #include "net.hpp"
-#include "../game/guess_type.hpp"
+
+enum class guess_type;
+
+class base_game_net_interface
+{
+public:
+	virtual ~base_game_net_interface() {}
+	virtual void on_start() {}
+	virtual void on_recieve_guess(uint32_t) {}
+	virtual void on_recieve_validation(guess_type) {}
+	virtual void on_end() {}
+};
 
 class net_client : public net::client_interface<message_type>
 {
 public:
-	net_client(std::function<void()> on_start_func, std::function<void(uint32_t guess_index)> on_recieve_guess_func,
-		   std::function<void(guess_type type)> on_recieve_validation_func, std::function<void()> on_end_func)
-	    : on_start(on_start_func), on_recieve_guess(on_recieve_guess_func), on_recieve_validation(on_recieve_validation_func), on_end(on_end_func){};
+	net_client(base_game_net_interface &game_interface) : game_interface(game_interface) {}
 
 	void start()
 	{
@@ -63,27 +71,26 @@ public:
 
 				case message_type::start: {
 					std::cout << "Starting Game" << std::endl;
-					on_start();
+					game_interface.on_start();
 				} break;
 
 				case message_type::recv_guess: {
 					std::cout << "Recived Guess" << std::endl;
 					uint32_t guess;
 					msg >> guess;
-					on_recieve_guess(guess);
+					game_interface.on_recieve_guess(guess);
 				} break;
 
 				case message_type::recv_validation: {
 					std::cout << "Recived Validation: ";
 					guess_type type;
 					msg >> type;
-					std::cout << "guess " << (type == guess_type::hit || type == guess_type::hit_and_sunk ? "good" : "bad") << std::endl;
-					on_recieve_validation(type);
+					game_interface.on_recieve_validation(type);
 				} break;
 
 				case message_type::end: {
 					std::cout << "Ending Game" << std::endl;
-					on_end();
+					game_interface.on_end();
 				} break;
 
 				default:
@@ -98,8 +105,5 @@ public:
 	}
 
 private:
-	std::function<void()> on_start;
-	std::function<void(uint32_t guess_index)> on_recieve_guess;
-	std::function<void(guess_type type)> on_recieve_validation;
-	std::function<void()> on_end;
+	base_game_net_interface &game_interface;
 };

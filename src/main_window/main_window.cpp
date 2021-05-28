@@ -119,8 +119,8 @@ void main_window::menu_draw()
 
 void main_window::game_start()
 {
-	client.connect(hostname, port);
-	client.start();
+	game_interface.client.connect(hostname, port);
+	game_interface.client.start();
 	current_window = window_type::WAIT_INIT;
 }
 
@@ -136,7 +136,7 @@ void main_window::wait_update()
 		board.toggle_view();
 
 	// loop returns true on connection error
-	if (client.loop())
+	if (game_interface.client.loop())
 		quit = true;
 }
 
@@ -173,7 +173,7 @@ void main_window::board_update()
 	{
 	case KEY_SPACE: {
 		if (!board.has_guess) {
-			client.send_guess(board.get_guess_index());
+			game_interface.client.send_guess(board.get_guess_index());
 			current_window = window_type::WAIT_INIT;
 		}
 	} break;
@@ -187,7 +187,7 @@ void main_window::board_update()
 	}
 
 	// loop returns true on connection error
-	if (client.loop())
+	if (game_interface.client.loop())
 		quit = true;
 
 	board.update_highlight();
